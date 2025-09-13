@@ -6,7 +6,7 @@ pub mod notifier;
 pub mod utils;
 pub mod watcher;
 
-// Force Codecov workflow to run and upload 81.54% coverage
+// GPG signing enabled - all commits now verified
 
 pub use cli::Args;
 pub use config::Config;
