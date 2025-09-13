@@ -6,7 +6,7 @@ pub mod notifier;
 pub mod utils;
 pub mod watcher;
 
-// ✅ GPG signing working perfectly - all commits verified!
+// 🔒 All commits automatically signed - no manual work needed!
 
 pub use cli::Args;
 pub use config::Config;
