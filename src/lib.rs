@@ -6,7 +6,7 @@ pub mod notifier;
 pub mod utils;
 pub mod watcher;
 
-// Trigger CI to update badges
+// Force Codecov workflow to run and upload 81.54% coverage
 
 pub use cli::Args;
 pub use config::Config;
