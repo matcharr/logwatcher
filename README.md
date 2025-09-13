@@ -1,7 +1,7 @@
 # LogWatcher
 
 [![CI](https://github.com/matcharr/logwatcher/actions/workflows/basic.yml/badge.svg)](https://github.com/matcharr/logwatcher/actions)
-[![Coverage](https://github.com/matcharr/logwatcher/actions/workflows/codecov.yml/badge.svg)](https://github.com/matcharr/logwatcher/actions/workflows/codecov.yml)
+[![codecov](https://codecov.io/gh/matcharr/logwatcher/branch/main/graph/badge.svg)](https://codecov.io/gh/matcharr/logwatcher)
 [![SonarCloud](https://github.com/matcharr/logwatcher/actions/workflows/sonarcloud.yml/badge.svg)](https://github.com/matcharr/logwatcher/actions/workflows/sonarcloud.yml)
 [![Crates.io](https://img.shields.io/crates/v/log-watcher.svg)](https://crates.io/crates/log-watcher)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -298,6 +298,35 @@ RUST_LOG=debug logwatcher -f app.log
 ## License
 
 MIT License - see LICENSE file for details.
+
+## Testing & Coverage
+
+LogWatcher has comprehensive test coverage:
+
+- **29 Tests Total**: 13 integration tests + 16 unit tests
+- **Integration Tests**: End-to-end CLI functionality testing
+- **Unit Tests**: Core component testing (matcher, highlighter, notifier, etc.)
+- **Performance Benchmarks**: Real performance measurements
+- **Cross-platform Testing**: Linux, macOS, Windows
+
+### Running Tests
+
+```bash
+# Run all tests
+cargo test
+
+# Run only integration tests
+cargo test --test integration
+
+# Run benchmarks
+cargo bench
+
+# Check test coverage (requires cargo-tarpaulin)
+cargo install cargo-tarpaulin
+cargo tarpaulin --out Html
+```
+
+Coverage reports are automatically generated and uploaded to [Codecov](https://codecov.io/gh/matcharr/logwatcher) on every commit.
 
 ## Changelog
 
