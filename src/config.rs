@@ -27,7 +27,7 @@ impl Config {
     pub fn from_args(args: &Args) -> Result<Self> {
         let patterns = args.patterns();
         let notify_patterns = args.notify_patterns();
-        
+
         // Validate and compile regex patterns if needed
         let regex_patterns = if args.regex {
             Self::compile_regex_patterns(&patterns, args.case_insensitive)?
@@ -58,32 +58,32 @@ impl Config {
 
     fn compile_regex_patterns(patterns: &[String], case_insensitive: bool) -> Result<Vec<Regex>> {
         let mut compiled = Vec::new();
-        
+
         for pattern in patterns {
             let mut regex_builder = regex::RegexBuilder::new(pattern);
             regex_builder.case_insensitive(case_insensitive);
-            
+
             let regex = regex_builder
                 .build()
                 .with_context(|| format!("Invalid regex pattern: {}", pattern))?;
-            
+
             compiled.push(regex);
         }
-        
+
         Ok(compiled)
     }
 
     fn parse_color_mappings(mappings: &[(String, String)]) -> Result<HashMap<String, Color>> {
         let mut color_map = HashMap::new();
-        
+
         for (pattern, color_name) in mappings {
             let color = Self::parse_color(color_name)?;
             color_map.insert(pattern.clone(), color);
         }
-        
+
         // Add default color mappings if not specified
         Self::add_default_color_mappings(&mut color_map);
-        
+
         Ok(color_map)
     }
 
@@ -126,5 +126,59 @@ impl Config {
     /// Get color for a pattern
     pub fn get_color_for_pattern(&self, pattern: &str) -> Option<Color> {
         self.color_mappings.get(pattern).copied()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_all_color_parsing() {
+        // Test all color mappings to cover the uncovered lines
+        assert_eq!(Config::parse_color("yellow").unwrap(), Color::Yellow);
+        assert_eq!(Config::parse_color("magenta").unwrap(), Color::Magenta);
+        assert_eq!(Config::parse_color("cyan").unwrap(), Color::Cyan);
+        assert_eq!(Config::parse_color("white").unwrap(), Color::White);
+    }
+
+    #[test]
+    fn test_parse_color_unknown_coverage_line_100() {
+        // Test unknown color to cover line 100 (_ => Err(...))
+        let result = Config::parse_color("unknown_color");
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("Unknown color: unknown_color"));
+    }
+
+    #[test]
+    fn test_get_color_for_pattern() {
+        let args = Args {
+            files: vec![PathBuf::from("test.log")],
+            patterns: "ERROR".to_string(),
+            regex: false,
+            case_insensitive: false,
+            color_map: None,
+            notify: false,
+            notify_patterns: None,
+            quiet: false,
+            dry_run: false,
+            prefix_file: Some(false),
+            poll_interval: 1000,
+            buffer_size: 8192,
+            no_color: false,
+            notify_throttle: 0,
+        };
+
+        let config = Config::from_args(&args).unwrap();
+
+        // Test that default color mappings work
+        assert_eq!(config.get_color_for_pattern("ERROR"), Some(Color::Red));
+        assert_eq!(config.get_color_for_pattern("WARN"), Some(Color::Yellow));
+        assert_eq!(config.get_color_for_pattern("INFO"), Some(Color::Green));
+        assert_eq!(config.get_color_for_pattern("DEBUG"), Some(Color::Cyan));
+        assert_eq!(config.get_color_for_pattern("UNKNOWN"), None);
     }
 }

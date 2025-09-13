@@ -1,0 +1,3 @@
+# Clippy configuration
+cognitive-complexity-threshold = 30
+single-char-binding-names-threshold = 4

@@ -6,6 +6,8 @@ pub mod notifier;
 pub mod utils;
 pub mod watcher;
 
+// 🔐 SSH key signing enabled - much more reliable!
+
 pub use cli::Args;
 pub use config::Config;
 pub use highlighter::Highlighter;

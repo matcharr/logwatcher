@@ -22,7 +22,7 @@ impl Matcher {
     pub fn new(config: Config) -> Self {
         let mut literal_patterns = Vec::new();
         let mut regex_patterns = Vec::new();
-        
+
         if config.regex_patterns.is_empty() {
             // Use literal patterns
             literal_patterns = config.patterns.clone();
@@ -66,7 +66,7 @@ impl Matcher {
             if search_line.contains(&search_pattern) {
                 let color = self.pattern_colors.get(pattern).copied();
                 let should_notify = self.config.should_notify_for_pattern(pattern);
-                
+
                 return MatchResult {
                     matched: true,
                     pattern: Some(pattern.clone()),
@@ -90,7 +90,7 @@ impl Matcher {
                 let pattern = self.config.patterns.get(i).cloned().unwrap_or_default();
                 let color = self.pattern_colors.get(&pattern).copied();
                 let should_notify = self.config.should_notify_for_pattern(&pattern);
-                
+
                 return MatchResult {
                     matched: true,
                     pattern: Some(pattern),
@@ -116,7 +116,7 @@ impl Matcher {
     /// Get all patterns that match a line
     pub fn get_all_matches(&self, line: &str) -> Vec<String> {
         let mut matches = Vec::new();
-        
+
         if self.config.regex_patterns.is_empty() {
             let search_line = if self.config.case_insensitive {
                 line.to_lowercase()
@@ -227,5 +227,63 @@ mod tests {
         assert_eq!(matches.len(), 2);
         assert!(matches.contains(&"ERROR".to_string()));
         assert!(matches.contains(&"WARN".to_string()));
+    }
+
+    #[test]
+    fn test_has_match_coverage_line_112() {
+        let config = create_test_config("ERROR", false, false);
+        let matcher = Matcher::new(config);
+
+        // Test has_match method to cover line 112
+        assert!(matcher.has_match("ERROR: Something went wrong"));
+        assert!(!matcher.has_match("INFO: Normal operation"));
+    }
+
+    #[test]
+    fn test_get_all_matches_coverage_lines_122_129_139_141() {
+        let config = create_test_config("ERROR,WARN", false, false);
+        let matcher = Matcher::new(config);
+
+        // Test get_all_matches to cover lines 122, 129, 139, 141
+        let matches =
+            matcher.get_all_matches("ERROR: Something went wrong WARN: This is a warning");
+        assert_eq!(matches.len(), 2);
+        assert!(matches.contains(&"ERROR".to_string()));
+        assert!(matches.contains(&"WARN".to_string()));
+
+        // Test with regex patterns
+        let regex_config = create_test_config("ERROR,WARN", true, false);
+        let regex_matcher = Matcher::new(regex_config);
+        let regex_matches = regex_matcher.get_all_matches("ERROR: Something went wrong");
+        assert_eq!(regex_matches.len(), 1);
+        assert!(regex_matches.contains(&"ERROR".to_string()));
+    }
+
+    #[test]
+    fn test_case_insensitive_get_all_matches_coverage_line_122() {
+        let config = create_test_config("ERROR,WARN", false, true);
+        let matcher = Matcher::new(config);
+
+        // Test case insensitive matching to cover line 122
+        let matches =
+            matcher.get_all_matches("error: Something went wrong warn: This is a warning");
+        assert_eq!(matches.len(), 2);
+        assert!(matches.contains(&"ERROR".to_string()));
+        assert!(matches.contains(&"WARN".to_string()));
+    }
+
+    #[test]
+    fn test_regex_get_all_matches_coverage_lines_139_141() {
+        let config = create_test_config("ERROR,WARN", true, false);
+        let matcher = Matcher::new(config);
+
+        // Test regex matching to cover lines 139, 141
+        let matches = matcher.get_all_matches("ERROR: Something went wrong");
+        assert_eq!(matches.len(), 1);
+        assert!(matches.contains(&"ERROR".to_string()));
+
+        // Test with no matches
+        let no_matches = matcher.get_all_matches("INFO: Normal operation");
+        assert!(no_matches.is_empty());
     }
 }

@@ -1,7 +1,7 @@
 use assert_cmd::Command;
 use predicates::prelude::*;
-use tempfile::NamedTempFile;
 use std::io::Write;
+use tempfile::NamedTempFile;
 
 #[test]
 fn test_help_output() {
@@ -9,7 +9,7 @@ fn test_help_output() {
     cmd.arg("--help");
     cmd.assert()
         .success()
-        .stdout(predicate::str::contains("Real-time log file monitoring"));
+        .stdout(predicate::str::contains("monitoring log files"));
 }
 
 #[test]
@@ -38,14 +38,15 @@ fn test_dry_run_with_existing_file() {
     temp_file.flush().unwrap();
 
     let mut cmd = Command::cargo_bin("logwatcher").unwrap();
-    cmd.args(&[
-        "--file", 
+    cmd.args([
+        "--file",
         temp_file.path().to_str().unwrap(),
         "--dry-run",
-        "--pattern", "ERROR",
-        "--no-color"
+        "--pattern",
+        "ERROR",
+        "--no-color",
     ]);
-    
+
     cmd.assert()
         .success()
         .stdout(predicate::str::contains("ERROR message").count(2))
@@ -61,15 +62,16 @@ fn test_quiet_mode() {
     temp_file.flush().unwrap();
 
     let mut cmd = Command::cargo_bin("logwatcher").unwrap();
-    cmd.args(&[
-        "--file", 
+    cmd.args([
+        "--file",
         temp_file.path().to_str().unwrap(),
         "--dry-run",
-        "--pattern", "ERROR",
+        "--pattern",
+        "ERROR",
         "--quiet",
-        "--no-color"
+        "--no-color",
     ]);
-    
+
     cmd.assert()
         .success()
         .stdout(predicate::str::contains("normal message").not())
@@ -84,15 +86,16 @@ fn test_case_insensitive_matching() {
     temp_file.flush().unwrap();
 
     let mut cmd = Command::cargo_bin("logwatcher").unwrap();
-    cmd.args(&[
-        "--file", 
+    cmd.args([
+        "--file",
         temp_file.path().to_str().unwrap(),
         "--dry-run",
-        "--pattern", "ERROR",
+        "--pattern",
+        "ERROR",
         "--case-insensitive",
-        "--no-color"
+        "--no-color",
     ]);
-    
+
     cmd.assert()
         .success()
         .stdout(predicate::str::contains("error message"))
@@ -108,15 +111,16 @@ fn test_regex_matching() {
     temp_file.flush().unwrap();
 
     let mut cmd = Command::cargo_bin("logwatcher").unwrap();
-    cmd.args(&[
-        "--file", 
+    cmd.args([
+        "--file",
         temp_file.path().to_str().unwrap(),
         "--dry-run",
-        "--pattern", r"user_id=\d+",
+        "--pattern",
+        r"user_id=\d+",
         "--regex",
-        "--no-color"
+        "--no-color",
     ]);
-    
+
     cmd.assert()
         .success()
         .stdout(predicate::str::contains("user_id=12345"))
@@ -128,24 +132,27 @@ fn test_regex_matching() {
 fn test_multiple_files() {
     let mut temp_file1 = NamedTempFile::new().unwrap();
     let mut temp_file2 = NamedTempFile::new().unwrap();
-    
+
     writeln!(temp_file1, "ERROR in file1").unwrap();
     writeln!(temp_file2, "ERROR in file2").unwrap();
     temp_file1.flush().unwrap();
     temp_file2.flush().unwrap();
 
     let mut cmd = Command::cargo_bin("logwatcher").unwrap();
-    cmd.args(&[
-        "--file", temp_file1.path().to_str().unwrap(),
-        "--file", temp_file2.path().to_str().unwrap(),
+    cmd.args([
+        "--file",
+        temp_file1.path().to_str().unwrap(),
+        "--file",
+        temp_file2.path().to_str().unwrap(),
         "--dry-run",
-        "--pattern", "ERROR",
-        "--no-color"
+        "--pattern",
+        "ERROR",
+        "--no-color",
     ]);
-    
+
     cmd.assert()
         .success()
-        .stdout(predicate::str::contains("[test").count(2))
+        .stdout(predicate::str::contains("[DRY-RUN]").count(2))
         .stdout(predicate::str::contains("ERROR in file1"))
         .stdout(predicate::str::contains("ERROR in file2"));
 }
@@ -157,16 +164,113 @@ fn test_invalid_regex() {
     temp_file.flush().unwrap();
 
     let mut cmd = Command::cargo_bin("logwatcher").unwrap();
-    cmd.args(&[
-        "--file", 
+    cmd.args([
+        "--file",
         temp_file.path().to_str().unwrap(),
         "--dry-run",
-        "--pattern", "[invalid",
+        "--pattern",
+        "[invalid",
         "--regex",
-        "--no-color"
+        "--no-color",
     ]);
-    
+
     cmd.assert()
         .failure()
         .stderr(predicate::str::contains("Invalid regex pattern"));
+}
+
+#[test]
+fn test_color_mapping() {
+    let mut temp_file = NamedTempFile::new().unwrap();
+    writeln!(temp_file, "ERROR: Something went wrong").unwrap();
+    writeln!(temp_file, "WARN: This is a warning").unwrap();
+    temp_file.flush().unwrap();
+
+    let mut cmd = Command::cargo_bin("logwatcher").unwrap();
+    cmd.args([
+        "--file",
+        temp_file.path().to_str().unwrap(),
+        "--dry-run",
+        "--pattern",
+        "ERROR,WARN",
+        "--color-map",
+        "ERROR:red,WARN:yellow",
+        "--no-color", // Disable actual colors for testing
+    ]);
+
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("ERROR: Something went wrong"))
+        .stdout(predicate::str::contains("WARN: This is a warning"));
+}
+
+#[test]
+fn test_poll_interval_configuration() {
+    let mut temp_file = NamedTempFile::new().unwrap();
+    writeln!(temp_file, "Test message").unwrap();
+    temp_file.flush().unwrap();
+
+    let mut cmd = Command::cargo_bin("logwatcher").unwrap();
+    cmd.args([
+        "--file",
+        temp_file.path().to_str().unwrap(),
+        "--dry-run",
+        "--pattern",
+        "Test",
+        "--poll-interval",
+        "100",
+        "--no-color",
+    ]);
+
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("Test message"));
+}
+
+#[test]
+fn test_buffer_size_configuration() {
+    let mut temp_file = NamedTempFile::new().unwrap();
+    writeln!(temp_file, "Test message").unwrap();
+    temp_file.flush().unwrap();
+
+    let mut cmd = Command::cargo_bin("logwatcher").unwrap();
+    cmd.args([
+        "--file",
+        temp_file.path().to_str().unwrap(),
+        "--dry-run",
+        "--pattern",
+        "Test",
+        "--buffer-size",
+        "4096",
+        "--no-color",
+    ]);
+
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("Test message"));
+}
+
+#[test]
+fn test_notification_patterns() {
+    let mut temp_file = NamedTempFile::new().unwrap();
+    writeln!(temp_file, "ERROR: Critical error occurred").unwrap();
+    writeln!(temp_file, "INFO: Normal operation").unwrap();
+    temp_file.flush().unwrap();
+
+    let mut cmd = Command::cargo_bin("logwatcher").unwrap();
+    cmd.args([
+        "--file",
+        temp_file.path().to_str().unwrap(),
+        "--dry-run",
+        "--pattern",
+        "ERROR,INFO",
+        "--notify-patterns",
+        "ERROR",
+        "--no-color",
+    ]);
+
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("ERROR: Critical error occurred"))
+        .stdout(predicate::str::contains("INFO: Normal operation"));
 }

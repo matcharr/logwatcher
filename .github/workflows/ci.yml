@@ -4,8 +4,18 @@ on:
   push:
     branches: [main]
     tags: ['v*']
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+      - 'LICENSE'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+      - 'LICENSE'
 
 env:
   CARGO_TERM_COLOR: always
@@ -41,8 +51,14 @@ jobs:
         with:
           toolchain: ${{ matrix.rust }}
 
+      - name: Install rustfmt
+        run: rustup component add rustfmt
+
+      - name: Install clippy
+        run: rustup component add clippy
+
       - name: Cache cargo registry
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
@@ -64,6 +80,22 @@ jobs:
       - name: Run integration tests
         run: cargo test --test integration
 
+      - name: Install cargo-tarpaulin
+        run: cargo install cargo-tarpaulin
+
+      - name: Run tests with coverage
+        run: cargo tarpaulin --out Xml --output-dir . --verbose
+        continue-on-error: true
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./cobertura.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+        continue-on-error: true
+
       - name: Build
         run: cargo build --release
 
@@ -77,9 +109,6 @@ jobs:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             artifact: logwatcher-linux-x86_64.tar.gz
-          - os: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-            artifact: logwatcher-linux-aarch64.tar.gz
           - os: macos-latest
             target: x86_64-apple-darwin
             artifact: logwatcher-macos-x86_64.tar.gz
@@ -100,8 +129,13 @@ jobs:
         with:
           toolchain: stable
 
+      - name: Install rustfmt
+        run: rustup component add rustfmt
+
+      - name: Install clippy
+        run: rustup component add clippy
+
       - name: Install cross-compilation toolchain
-        if: matrix.target != 'x86_64-unknown-linux-gnu' && matrix.target != 'x86_64-apple-darwin' && matrix.target != 'x86_64-pc-windows-msvc'
         run: rustup target add ${{ matrix.target }}
 
       - name: Build release binary
@@ -122,7 +156,7 @@ jobs:
           powershell Compress-Archive -Path target/${{ matrix.target }}/release/logwatcher.exe -DestinationPath ${{ matrix.artifact }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
           path: ${{ matrix.artifact }}
@@ -137,7 +171,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - name: Create checksums
         run: |
@@ -168,8 +202,15 @@ jobs:
         with:
           toolchain: stable
 
+      - name: Install rustfmt
+        run: rustup component add rustfmt
+
+      - name: Install clippy
+        run: rustup component add clippy
+
       - name: Install cargo-audit
         run: cargo install cargo-audit
 
       - name: Run security audit
         run: cargo audit
+

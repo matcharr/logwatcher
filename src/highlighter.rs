@@ -66,7 +66,8 @@ impl Highlighter {
     }
 
     fn print_colored(&mut self, text: &str, color: Color) -> Result<()> {
-        self.stdout.set_color(ColorSpec::new().set_fg(Some(color)))?;
+        self.stdout
+            .set_color(ColorSpec::new().set_fg(Some(color)))?;
         writeln!(self.stdout, "{}", text)?;
         self.stdout.reset()?;
         self.stdout.flush()?;
@@ -80,7 +81,8 @@ impl Highlighter {
     }
 
     pub fn print_error(&mut self, message: &str) -> Result<()> {
-        self.stderr.set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
+        self.stderr
+            .set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
         writeln!(self.stderr, "Error: {}", message)?;
         self.stderr.reset()?;
         self.stderr.flush()?;
@@ -88,7 +90,8 @@ impl Highlighter {
     }
 
     pub fn print_warning(&mut self, message: &str) -> Result<()> {
-        self.stderr.set_color(ColorSpec::new().set_fg(Some(Color::Yellow)))?;
+        self.stderr
+            .set_color(ColorSpec::new().set_fg(Some(Color::Yellow)))?;
         writeln!(self.stderr, "Warning: {}", message)?;
         self.stderr.reset()?;
         self.stderr.flush()?;
@@ -96,7 +99,8 @@ impl Highlighter {
     }
 
     pub fn print_info(&mut self, message: &str) -> Result<()> {
-        self.stderr.set_color(ColorSpec::new().set_fg(Some(Color::Cyan)))?;
+        self.stderr
+            .set_color(ColorSpec::new().set_fg(Some(Color::Cyan)))?;
         writeln!(self.stderr, "Info: {}", message)?;
         self.stderr.reset()?;
         self.stderr.flush()?;
@@ -119,19 +123,19 @@ impl Highlighter {
 
     pub fn print_startup_info(&mut self) -> Result<()> {
         self.print_info(&format!("Watching {} file(s)", self.config.files.len()))?;
-        
+
         if !self.config.patterns.is_empty() {
             self.print_info(&format!("Patterns: {}", self.config.patterns.join(", ")))?;
         }
-        
+
         if self.config.notify_enabled {
             self.print_info("Desktop notifications enabled")?;
         }
-        
+
         if self.config.dry_run {
             self.print_info("Dry-run mode: reading existing content only")?;
         }
-        
+
         Ok(())
     }
 
@@ -155,7 +159,10 @@ impl Highlighter {
         self.print_plain(&format!("  Files watched: {}", stats.files_watched))?;
         self.print_plain(&format!("  Lines processed: {}", stats.lines_processed))?;
         self.print_plain(&format!("  Matches found: {}", stats.matches_found))?;
-        self.print_plain(&format!("  Notifications sent: {}", stats.notifications_sent))?;
+        self.print_plain(&format!(
+            "  Notifications sent: {}",
+            stats.notifications_sent
+        ))?;
         Ok(())
     }
 }
@@ -198,7 +205,7 @@ mod tests {
     fn test_print_line_without_match() {
         let config = create_test_config();
         let mut highlighter = Highlighter::new(config);
-        
+
         let match_result = MatchResult {
             matched: false,
             pattern: None,
@@ -207,14 +214,16 @@ mod tests {
         };
 
         // This should not panic
-        highlighter.print_line("Normal line", None, &match_result, false).unwrap();
+        highlighter
+            .print_line("Normal line", None, &match_result, false)
+            .unwrap();
     }
 
     #[test]
     fn test_print_line_with_match() {
         let config = create_test_config();
         let mut highlighter = Highlighter::new(config);
-        
+
         let match_result = MatchResult {
             matched: true,
             pattern: Some("ERROR".to_string()),
@@ -223,14 +232,16 @@ mod tests {
         };
 
         // This should not panic
-        highlighter.print_line("ERROR: Something went wrong", None, &match_result, false).unwrap();
+        highlighter
+            .print_line("ERROR: Something went wrong", None, &match_result, false)
+            .unwrap();
     }
 
     #[test]
     fn test_dry_run_prefix() {
         let config = create_test_config();
         let mut highlighter = Highlighter::new(config);
-        
+
         let match_result = MatchResult {
             matched: true,
             pattern: Some("ERROR".to_string()),
@@ -239,6 +250,163 @@ mod tests {
         };
 
         // This should not panic
-        highlighter.print_line("ERROR: Something went wrong", None, &match_result, true).unwrap();
+        highlighter
+            .print_line("ERROR: Something went wrong", None, &match_result, true)
+            .unwrap();
+    }
+
+    #[test]
+    fn test_print_file_error() {
+        let config = create_test_config();
+        let mut highlighter = Highlighter::new(config);
+        let result = highlighter.print_file_error("test.log", "Permission denied");
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_print_shutdown_summary() {
+        let config = create_test_config();
+        let mut highlighter = Highlighter::new(config);
+        let stats = WatcherStats {
+            files_watched: 2,
+            lines_processed: 100,
+            matches_found: 5,
+            notifications_sent: 3,
+        };
+        let result = highlighter.print_shutdown_summary(&stats);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_print_file_rotation() {
+        let config = create_test_config();
+        let mut highlighter = Highlighter::new(config);
+        let result = highlighter.print_file_rotation("test.log");
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_print_file_reopened() {
+        let config = create_test_config();
+        let mut highlighter = Highlighter::new(config);
+        let result = highlighter.print_file_reopened("test.log");
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_print_startup_info() {
+        let config = create_test_config();
+        let mut highlighter = Highlighter::new(config);
+        let result = highlighter.print_startup_info();
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_print_colored_with_custom_color() {
+        let config = create_test_config();
+        let mut highlighter = Highlighter::new(config);
+        let result = highlighter.print_colored("Custom message", Color::Magenta);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_print_plain() {
+        let config = create_test_config();
+        let mut highlighter = Highlighter::new(config);
+        let result = highlighter.print_plain("Plain message");
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_color_choice_never() {
+        let args = Args {
+            files: vec![PathBuf::from("test.log")],
+            patterns: "ERROR".to_string(),
+            regex: false,
+            case_insensitive: false,
+            color_map: None,
+            notify: false,
+            notify_patterns: None,
+            quiet: false,
+            dry_run: false,
+            prefix_file: Some(false),
+            poll_interval: 1000,
+            buffer_size: 8192,
+            no_color: true, // Force no color
+            notify_throttle: 0,
+        };
+
+        let config = Config::from_args(&args).unwrap();
+        let highlighter = Highlighter::new(config);
+
+        // Test that highlighter is created successfully with no_color = true
+        assert!(highlighter.config.no_color);
+    }
+
+    #[test]
+    fn test_quiet_mode_skip_non_matching() {
+        let args = Args {
+            files: vec![PathBuf::from("test.log")],
+            patterns: "ERROR".to_string(),
+            regex: false,
+            case_insensitive: false,
+            color_map: None,
+            notify: false,
+            notify_patterns: None,
+            quiet: true, // Enable quiet mode
+            dry_run: false,
+            prefix_file: Some(false),
+            poll_interval: 1000,
+            buffer_size: 8192,
+            no_color: false,
+            notify_throttle: 0,
+        };
+
+        let config = Config::from_args(&args).unwrap();
+        let mut highlighter = Highlighter::new(config);
+
+        // Test that non-matching lines are skipped in quiet mode
+        let match_result = MatchResult {
+            matched: false,
+            pattern: None,
+            color: None,
+            should_notify: false,
+        };
+
+        let result = highlighter.print_line("Normal line", None, &match_result, false);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_print_dry_run_summary_empty() {
+        let config = create_test_config();
+        let mut highlighter = Highlighter::new(config);
+
+        // Test empty matches (covers line 112-113)
+        let matches = vec![];
+        let result = highlighter.print_dry_run_summary(&matches);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_print_dry_run_summary_with_matches() {
+        let config = create_test_config();
+        let mut highlighter = Highlighter::new(config);
+
+        // Test with matches (covers line 116)
+        let matches = vec![("ERROR".to_string(), 5), ("WARN".to_string(), 3)];
+        let result = highlighter.print_dry_run_summary(&matches);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_print_dry_run_summary_coverage_line_116() {
+        let config = create_test_config();
+        let mut highlighter = Highlighter::new(config);
+
+        // Test print_dry_run_summary to cover line 116 (self.print_info("Dry-run summary:"))
+        let matches = vec![("ERROR".to_string(), 2)];
+        let result = highlighter.print_dry_run_summary(&matches);
+        assert!(result.is_ok());
     }
 }

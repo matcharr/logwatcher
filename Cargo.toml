@@ -1,13 +1,20 @@
 [package]
-name = "logwatcher"
-version = "0.1.0"
+name = "log-watcher"
+version = "0.2.0"
 edition = "2021"
 authors = ["Mathis Charretier <mathis.charretier@protonmail.com>"]
 description = "Real-time log file monitoring with pattern highlighting and desktop notifications"
 license = "MIT"
 repository = "https://github.com/matcharr/logwatcher"
+homepage = "https://github.com/matcharr/logwatcher"
+documentation = "https://docs.rs/log-watcher"
+readme = "README.md"
 keywords = ["logs", "monitoring", "cli", "tail", "notifications"]
 categories = ["command-line-utilities", "development-tools"]
+
+[lib]
+name = "log_watcher"
+path = "src/lib.rs"
 
 [[bin]]
 name = "logwatcher"

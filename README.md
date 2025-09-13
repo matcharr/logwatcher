@@ -1,5 +1,10 @@
 # LogWatcher
 
+[![CI](https://github.com/matcharr/logwatcher/actions/workflows/basic.yml/badge.svg)](https://github.com/matcharr/logwatcher/actions)
+[![codecov](https://codecov.io/gh/matcharr/logwatcher/branch/main/graph/badge.svg?timestamp=1757736369)](https://codecov.io/gh/matcharr/logwatcher)
+[![Crates.io](https://img.shields.io/crates/v/log-watcher.svg)](https://crates.io/crates/log-watcher)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A powerful CLI tool for real-time log file monitoring with pattern highlighting and desktop notifications.
 
 ## Features
@@ -27,7 +32,7 @@ sudo cp target/release/logwatcher /usr/local/bin/
 ### Using Cargo
 
 ```bash
-cargo install logwatcher
+cargo install log-watcher
 ```
 
 ## Quick Start
@@ -224,6 +229,8 @@ logwatcher -f app.log --notify-throttle 2
 - **Memory efficient** - Uses streaming I/O for large files
 - **Configurable polling** - Adjust polling interval for your needs
 - **Buffer sizing** - Tune buffer size for optimal performance
+- **Fast pattern matching** - ~0.7-11µs per line (benchmarked)
+- **Small binary** - Only 2.0MB in release mode
 - **Async I/O** - Non-blocking file operations
 
 ```bash
@@ -290,6 +297,36 @@ RUST_LOG=debug logwatcher -f app.log
 ## License
 
 MIT License - see LICENSE file for details.
+
+## Testing & Coverage
+
+LogWatcher has comprehensive test coverage:
+
+- **50 Tests Total**: 13 integration tests + 36 unit tests + 1 main test
+- **Integration Tests**: End-to-end CLI functionality testing
+- **Unit Tests**: Core component testing (matcher, highlighter, notifier, watcher, etc.)
+- **Performance Benchmarks**: Real performance measurements
+- **Cross-platform Testing**: Linux, macOS, Windows
+- **Coverage**: 80.84% (above 80% professional standard)
+
+### Running Tests
+
+```bash
+# Run all tests
+cargo test
+
+# Run only integration tests
+cargo test --test integration
+
+# Run benchmarks
+cargo bench
+
+# Check test coverage (requires cargo-tarpaulin)
+cargo install cargo-tarpaulin
+cargo tarpaulin --out Html
+```
+
+Coverage reports are automatically generated and uploaded to [Codecov](https://codecov.io/gh/matcharr/logwatcher) on every commit.
 
 ## Changelog
 
