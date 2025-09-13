@@ -178,3 +178,99 @@ fn test_invalid_regex() {
         .failure()
         .stderr(predicate::str::contains("Invalid regex pattern"));
 }
+
+#[test]
+fn test_color_mapping() {
+    let mut temp_file = NamedTempFile::new().unwrap();
+    writeln!(temp_file, "ERROR: Something went wrong").unwrap();
+    writeln!(temp_file, "WARN: This is a warning").unwrap();
+    temp_file.flush().unwrap();
+
+    let mut cmd = Command::cargo_bin("logwatcher").unwrap();
+    cmd.args([
+        "--file",
+        temp_file.path().to_str().unwrap(),
+        "--dry-run",
+        "--pattern",
+        "ERROR,WARN",
+        "--color-map",
+        "ERROR:red,WARN:yellow",
+        "--no-color", // Disable actual colors for testing
+    ]);
+
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("ERROR: Something went wrong"))
+        .stdout(predicate::str::contains("WARN: This is a warning"));
+}
+
+#[test]
+fn test_poll_interval_configuration() {
+    let mut temp_file = NamedTempFile::new().unwrap();
+    writeln!(temp_file, "Test message").unwrap();
+    temp_file.flush().unwrap();
+
+    let mut cmd = Command::cargo_bin("logwatcher").unwrap();
+    cmd.args([
+        "--file",
+        temp_file.path().to_str().unwrap(),
+        "--dry-run",
+        "--pattern",
+        "Test",
+        "--poll-interval",
+        "100",
+        "--no-color",
+    ]);
+
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("Test message"));
+}
+
+#[test]
+fn test_buffer_size_configuration() {
+    let mut temp_file = NamedTempFile::new().unwrap();
+    writeln!(temp_file, "Test message").unwrap();
+    temp_file.flush().unwrap();
+
+    let mut cmd = Command::cargo_bin("logwatcher").unwrap();
+    cmd.args([
+        "--file",
+        temp_file.path().to_str().unwrap(),
+        "--dry-run",
+        "--pattern",
+        "Test",
+        "--buffer-size",
+        "4096",
+        "--no-color",
+    ]);
+
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("Test message"));
+}
+
+#[test]
+fn test_notification_patterns() {
+    let mut temp_file = NamedTempFile::new().unwrap();
+    writeln!(temp_file, "ERROR: Critical error occurred").unwrap();
+    writeln!(temp_file, "INFO: Normal operation").unwrap();
+    temp_file.flush().unwrap();
+
+    let mut cmd = Command::cargo_bin("logwatcher").unwrap();
+    cmd.args([
+        "--file",
+        temp_file.path().to_str().unwrap(),
+        "--dry-run",
+        "--pattern",
+        "ERROR,INFO",
+        "--notify-patterns",
+        "ERROR",
+        "--no-color",
+    ]);
+
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("ERROR: Critical error occurred"))
+        .stdout(predicate::str::contains("INFO: Normal operation"));
+}
