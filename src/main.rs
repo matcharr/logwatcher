@@ -1,7 +1,7 @@
 use clap::Parser;
-use logwatcher::cli::Args;
-use logwatcher::config::Config;
-use logwatcher::watcher::LogWatcher;
+use log_watcher::cli::Args;
+use log_watcher::config::Config;
+use log_watcher::watcher::LogWatcher;
 use std::process;
 use tracing::{error, info};
 

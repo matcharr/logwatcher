@@ -1,5 +1,5 @@
 [package]
-name = "logwatcher"
+name = "log-watcher"
 version = "0.1.0"
 edition = "2021"
 authors = ["Mathis Charretier <mathis.charretier@protonmail.com>"]
