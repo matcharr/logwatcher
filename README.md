@@ -1,6 +1,6 @@
 # LogWatcher
 
-[![CI](https://github.com/matcharr/logwatcher/workflows/CI/badge.svg)](https://github.com/matcharr/logwatcher/actions)
+[![CI](https://github.com/matcharr/logwatcher/actions/workflows/ci.yml/badge.svg)](https://github.com/matcharr/logwatcher/actions)
 [![codecov](https://codecov.io/gh/matcharr/logwatcher/branch/main/graph/badge.svg)](https://codecov.io/gh/matcharr/logwatcher)
 [![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=matcharr_logwatcher&metric=alert_status)](https://sonarcloud.io/dashboard?id=matcharr_logwatcher)
 [![Crates.io](https://img.shields.io/crates/v/logwatcher.svg)](https://crates.io/crates/logwatcher)
