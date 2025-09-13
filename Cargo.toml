@@ -9,6 +9,10 @@ repository = "https://github.com/matcharr/logwatcher"
 keywords = ["logs", "monitoring", "cli", "tail", "notifications"]
 categories = ["command-line-utilities", "development-tools"]
 
+[lib]
+name = "log_watcher"
+path = "src/lib.rs"
+
 [[bin]]
 name = "logwatcher"
 path = "src/main.rs"

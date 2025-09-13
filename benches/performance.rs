@@ -1,7 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use logwatcher::cli::Args;
-use logwatcher::config::Config;
-use logwatcher::matcher::Matcher;
+use log_watcher::cli::Args;
+use log_watcher::config::Config;
+use log_watcher::matcher::Matcher;
 use std::path::PathBuf;
 
 fn create_test_config(patterns: &str, regex: bool) -> Config {
