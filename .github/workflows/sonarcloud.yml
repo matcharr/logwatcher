@@ -1,21 +1,22 @@
 name: SonarCloud Analysis
 
-on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - '.gitignore'
-      - 'LICENSE'
-  pull_request:
-    types: [opened, synchronize, reopened]
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - '.gitignore'
-      - 'LICENSE'
+# Temporarily disabled - requires manual SonarCloud setup
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths-ignore:
+#       - '**.md'
+#       - 'docs/**'
+#       - '.gitignore'
+#       - 'LICENSE'
+#   pull_request:
+#     types: [opened, synchronize, reopened]
+#     paths-ignore:
+#       - '**.md'
+#       - 'docs/**'
+#       - '.gitignore'
+#       - 'LICENSE'
 
 jobs:
   sonarqube:
