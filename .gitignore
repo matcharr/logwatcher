@@ -1,0 +1,37 @@
+# Rust
+/target/
+Cargo.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+test.log
+myapp.log
+
+# Test files
+test_output/
+temp_*
+
+# Build artifacts
+*.pdb
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Coverage reports
+tarpaulin-report.html
+lcov.info
+
+# Benchmark results
+criterion/
