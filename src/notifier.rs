@@ -1,5 +1,6 @@
 use crate::config::Config;
 use anyhow::Result;
+#[cfg(not(target_os = "windows"))]
 use notify_rust::Notification;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
