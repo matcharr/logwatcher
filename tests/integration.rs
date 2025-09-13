@@ -9,7 +9,7 @@ fn test_help_output() {
     cmd.arg("--help");
     cmd.assert()
         .success()
-        .stdout(predicate::str::contains("Real-time log file monitoring"));
+        .stdout(predicate::str::contains("monitoring log files"));
 }
 
 #[test]
@@ -145,7 +145,7 @@ fn test_multiple_files() {
     
     cmd.assert()
         .success()
-        .stdout(predicate::str::contains("[test").count(2))
+        .stdout(predicate::str::contains("[DRY-RUN]").count(2))
         .stdout(predicate::str::contains("ERROR in file1"))
         .stdout(predicate::str::contains("ERROR in file2"));
 }

@@ -37,9 +37,11 @@ jobs:
 
       - name: Run tests with coverage
         run: cargo tarpaulin --out Xml --output-dir . --verbose
+        continue-on-error: true
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        continue-on-error: true

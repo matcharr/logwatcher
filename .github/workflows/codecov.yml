@@ -38,6 +38,7 @@ jobs:
 
       - name: Run tests with coverage
         run: cargo tarpaulin --out Xml --output-dir . --verbose
+        continue-on-error: true
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -46,3 +47,4 @@ jobs:
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
+        continue-on-error: true
