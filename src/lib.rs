@@ -6,7 +6,7 @@ pub mod notifier;
 pub mod utils;
 pub mod watcher;
 
-// 🔒 All commits automatically signed - no manual work needed!
+// ✅ GPG signing fixed - using correct key D910D77A22D928D6
 
 pub use cli::Args;
 pub use config::Config;
