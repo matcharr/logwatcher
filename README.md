@@ -1,7 +1,7 @@
 # LogWatcher
 
 [![CI](https://github.com/matcharr/logwatcher/actions/workflows/basic.yml/badge.svg)](https://github.com/matcharr/logwatcher/actions)
-[![codecov](https://codecov.io/gh/matcharr/logwatcher/branch/main/graph/badge.svg?kill_cache=1)](https://codecov.io/gh/matcharr/logwatcher)
+[![codecov](https://codecov.io/gh/matcharr/logwatcher/branch/main/graph/badge.svg?timestamp=1757736369)](https://codecov.io/gh/matcharr/logwatcher)
 [![Crates.io](https://img.shields.io/crates/v/log-watcher.svg)](https://crates.io/crates/log-watcher)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
