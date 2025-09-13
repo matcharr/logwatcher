@@ -29,7 +29,7 @@ jobs:
           mkdir -p ~/.cargo
           cat >> ~/.cargo/config.toml << 'EOF'
           [registries.github]
-          index = "sparse+https://github.com/matcharr/logwatcher.git"
+          index = "sparse+https://github.com/matcharr/logwatcher.git/"
           token = "${{ secrets.GITHUB_TOKEN }}"
           EOF
 
