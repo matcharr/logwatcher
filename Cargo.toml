@@ -1,6 +1,6 @@
 [package]
 name = "log-watcher"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2021"
 authors = ["Mathis Charretier <mathis.charretier@protonmail.com>"]
 description = "Real-time log file monitoring with pattern highlighting and desktop notifications"
