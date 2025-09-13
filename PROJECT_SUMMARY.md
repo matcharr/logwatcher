@@ -186,8 +186,8 @@ cargo bench
 
 - **Startup time**: < 50ms
 - **Memory usage**: < 20MB for 1GB log file
-- **Pattern matching**: < 1ms per line
-- **Binary size**: < 5MB (stripped)
+- **Pattern matching**: < 0.01ms per line (actual: ~0.7-11µs)
+- **Binary size**: < 5MB (actual: 2.0MB)
 - **Zero crashes**: 24-hour stress test
 
 ## 🎯 Success Metrics

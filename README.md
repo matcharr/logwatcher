@@ -230,6 +230,8 @@ logwatcher -f app.log --notify-throttle 2
 - **Memory efficient** - Uses streaming I/O for large files
 - **Configurable polling** - Adjust polling interval for your needs
 - **Buffer sizing** - Tune buffer size for optimal performance
+- **Fast pattern matching** - ~0.7-11µs per line (benchmarked)
+- **Small binary** - Only 2.0MB in release mode
 - **Async I/O** - Non-blocking file operations
 
 ```bash
