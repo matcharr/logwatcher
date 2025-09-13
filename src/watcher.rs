@@ -635,7 +635,7 @@ mod tests {
         let result = watcher
             .process_line(temp_file.path(), "ERROR: Critical error occurred")
             .await;
-        
+
         // Check if the result is ok, if not print the error for debugging
         if let Err(e) = &result {
             eprintln!("Notification test failed with error: {}", e);
@@ -647,7 +647,7 @@ mod tests {
                 return;
             }
         }
-        
+
         assert!(result.is_ok());
         assert_eq!(watcher.stats.notifications_sent, 1);
     }
