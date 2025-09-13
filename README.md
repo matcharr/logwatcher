@@ -3,7 +3,7 @@
 [![CI](https://github.com/matcharr/logwatcher/actions/workflows/basic.yml/badge.svg)](https://github.com/matcharr/logwatcher/actions)
 [![Coverage](https://github.com/matcharr/logwatcher/actions/workflows/codecov.yml/badge.svg)](https://github.com/matcharr/logwatcher/actions/workflows/codecov.yml)
 [![SonarCloud](https://github.com/matcharr/logwatcher/actions/workflows/sonarcloud.yml/badge.svg)](https://github.com/matcharr/logwatcher/actions/workflows/sonarcloud.yml)
-[![Crates.io](https://img.shields.io/crates/v/logwatcher.svg)](https://crates.io/crates/logwatcher)
+[![Crates.io](https://img.shields.io/crates/v/log-watcher.svg)](https://crates.io/crates/log-watcher)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A powerful CLI tool for real-time log file monitoring with pattern highlighting and desktop notifications.
@@ -33,7 +33,7 @@ sudo cp target/release/logwatcher /usr/local/bin/
 ### Using Cargo
 
 ```bash
-cargo install logwatcher
+cargo install log-watcher
 ```
 
 ## Quick Start
