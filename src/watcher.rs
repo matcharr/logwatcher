@@ -8,7 +8,7 @@ use notify::{Event, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Seek, SeekFrom};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::Duration;
 use tokio::sync::mpsc;
 use tokio::time::sleep;
@@ -240,7 +240,7 @@ impl LogWatcher {
         let file = File::open(file_path)?;
         let reader = BufReader::new(file);
 
-        for (_line_num, line_result) in reader.lines().enumerate() {
+        for line_result in reader.lines() {
             let line = line_result?;
             self.stats.lines_processed += 1;
             let match_result = self.matcher.match_line(&line);
@@ -263,7 +263,7 @@ impl LogWatcher {
         Ok(pattern_counts)
     }
 
-    async fn process_line(&mut self, file_path: &PathBuf, line: &str) -> Result<()> {
+    async fn process_line(&mut self, file_path: &Path, line: &str) -> Result<()> {
         self.stats.lines_processed += 1;
 
         let match_result = self.matcher.match_line(line);
@@ -297,7 +297,7 @@ impl LogWatcher {
         Ok(())
     }
 
-    async fn handle_file_rotation(&mut self, file_path: &PathBuf) -> Result<()> {
+    async fn handle_file_rotation(&mut self, file_path: &Path) -> Result<()> {
         self.highlighter
             .print_file_rotation(&file_path.display().to_string())?;
 
@@ -325,6 +325,7 @@ enum FileEvent {
         file_path: PathBuf,
         line: String,
     },
+    #[allow(dead_code)]
     FileRotated {
         file_path: PathBuf,
     },

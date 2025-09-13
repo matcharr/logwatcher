@@ -38,7 +38,7 @@ fn test_dry_run_with_existing_file() {
     temp_file.flush().unwrap();
 
     let mut cmd = Command::cargo_bin("logwatcher").unwrap();
-    cmd.args(&[
+    cmd.args([
         "--file",
         temp_file.path().to_str().unwrap(),
         "--dry-run",
@@ -62,7 +62,7 @@ fn test_quiet_mode() {
     temp_file.flush().unwrap();
 
     let mut cmd = Command::cargo_bin("logwatcher").unwrap();
-    cmd.args(&[
+    cmd.args([
         "--file",
         temp_file.path().to_str().unwrap(),
         "--dry-run",
@@ -86,7 +86,7 @@ fn test_case_insensitive_matching() {
     temp_file.flush().unwrap();
 
     let mut cmd = Command::cargo_bin("logwatcher").unwrap();
-    cmd.args(&[
+    cmd.args([
         "--file",
         temp_file.path().to_str().unwrap(),
         "--dry-run",
@@ -111,7 +111,7 @@ fn test_regex_matching() {
     temp_file.flush().unwrap();
 
     let mut cmd = Command::cargo_bin("logwatcher").unwrap();
-    cmd.args(&[
+    cmd.args([
         "--file",
         temp_file.path().to_str().unwrap(),
         "--dry-run",
@@ -139,7 +139,7 @@ fn test_multiple_files() {
     temp_file2.flush().unwrap();
 
     let mut cmd = Command::cargo_bin("logwatcher").unwrap();
-    cmd.args(&[
+    cmd.args([
         "--file",
         temp_file1.path().to_str().unwrap(),
         "--file",
@@ -164,7 +164,7 @@ fn test_invalid_regex() {
     temp_file.flush().unwrap();
 
     let mut cmd = Command::cargo_bin("logwatcher").unwrap();
-    cmd.args(&[
+    cmd.args([
         "--file",
         temp_file.path().to_str().unwrap(),
         "--dry-run",
