@@ -135,7 +135,7 @@ log-watcher/
 
 ### Building
 ```bash
-git clone <repository-url>
+git clone https://github.com/matcharr/logwatcher.git
 cd log-watcher
 cargo build --release
 ```
