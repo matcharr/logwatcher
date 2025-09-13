@@ -222,7 +222,7 @@ mod tests {
     fn test_get_notification_count() {
         let config = create_test_config(true, 0);
         let notifier = Notifier::new(config);
-        
+
         let count = notifier.get_notification_count();
         let count_value = count.blocking_lock();
         assert_eq!(*count_value, 0);

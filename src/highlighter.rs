@@ -335,10 +335,10 @@ mod tests {
             no_color: true, // Force no color
             notify_throttle: 0,
         };
-        
+
         let config = Config::from_args(&args).unwrap();
         let highlighter = Highlighter::new(config);
-        
+
         // Test that highlighter is created successfully with no_color = true
         assert!(highlighter.config.no_color);
     }
@@ -361,10 +361,10 @@ mod tests {
             no_color: false,
             notify_throttle: 0,
         };
-        
+
         let config = Config::from_args(&args).unwrap();
         let mut highlighter = Highlighter::new(config);
-        
+
         // Test that non-matching lines are skipped in quiet mode
         let match_result = MatchResult {
             matched: false,
@@ -372,7 +372,7 @@ mod tests {
             color: None,
             should_notify: false,
         };
-        
+
         let result = highlighter.print_line("Normal line", None, &match_result, false);
         assert!(result.is_ok());
     }
@@ -381,7 +381,7 @@ mod tests {
     fn test_print_dry_run_summary_empty() {
         let config = create_test_config();
         let mut highlighter = Highlighter::new(config);
-        
+
         // Test empty matches (covers line 112-113)
         let matches = vec![];
         let result = highlighter.print_dry_run_summary(&matches);
@@ -392,7 +392,7 @@ mod tests {
     fn test_print_dry_run_summary_with_matches() {
         let config = create_test_config();
         let mut highlighter = Highlighter::new(config);
-        
+
         // Test with matches (covers line 116)
         let matches = vec![("ERROR".to_string(), 5), ("WARN".to_string(), 3)];
         let result = highlighter.print_dry_run_summary(&matches);

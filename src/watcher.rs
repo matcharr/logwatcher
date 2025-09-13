@@ -416,7 +416,9 @@ mod tests {
         let mut watcher = LogWatcher::new(config);
 
         // Test processing existing file content
-        let result = watcher.process_existing_file(&temp_file.path().to_path_buf()).await;
+        let result = watcher
+            .process_existing_file(&temp_file.path().to_path_buf())
+            .await;
         assert!(result.is_ok());
     }
 
@@ -430,7 +432,9 @@ mod tests {
         let mut watcher = LogWatcher::new(config);
 
         // Test processing a line
-        let result = watcher.process_line(&temp_file.path(), "ERROR: Test error").await;
+        let result = watcher
+            .process_line(temp_file.path(), "ERROR: Test error")
+            .await;
         assert!(result.is_ok());
     }
 
@@ -444,7 +448,7 @@ mod tests {
         let mut watcher = LogWatcher::new(config);
 
         // Test file rotation handling
-        let result = watcher.handle_file_rotation(&temp_file.path()).await;
+        let result = watcher.handle_file_rotation(temp_file.path()).await;
         assert!(result.is_ok());
     }
 
@@ -460,15 +464,16 @@ mod tests {
         // Test tail mode (short timeout to avoid hanging)
         let rt = tokio::runtime::Runtime::new().unwrap();
         let files = vec![temp_file.path().to_path_buf()];
-        
+
         // Use a short timeout for testing
         let result = rt.block_on(async {
             tokio::time::timeout(
                 std::time::Duration::from_millis(100),
-                watcher.run_tail_mode(&files)
-            ).await
+                watcher.run_tail_mode(&files),
+            )
+            .await
         });
-        
+
         // Should timeout (which is expected for this test)
         assert!(result.is_err());
     }

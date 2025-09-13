@@ -160,9 +160,9 @@ mod tests {
             no_color: false,
             notify_throttle: 0,
         };
-        
+
         let config = Config::from_args(&args).unwrap();
-        
+
         // Test that default color mappings work
         assert_eq!(config.get_color_for_pattern("ERROR"), Some(Color::Red));
         assert_eq!(config.get_color_for_pattern("WARN"), Some(Color::Yellow));
