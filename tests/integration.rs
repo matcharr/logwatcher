@@ -39,11 +39,12 @@ fn test_dry_run_with_existing_file() {
 
     let mut cmd = Command::cargo_bin("logwatcher").unwrap();
     cmd.args(&[
-        "--file", 
+        "--file",
         temp_file.path().to_str().unwrap(),
         "--dry-run",
-        "--pattern", "ERROR",
-        "--no-color"
+        "--pattern",
+        "ERROR",
+        "--no-color",
     ]);
     
     cmd.assert()
@@ -62,12 +63,13 @@ fn test_quiet_mode() {
 
     let mut cmd = Command::cargo_bin("logwatcher").unwrap();
     cmd.args(&[
-        "--file", 
+        "--file",
         temp_file.path().to_str().unwrap(),
         "--dry-run",
-        "--pattern", "ERROR",
+        "--pattern",
+        "ERROR",
         "--quiet",
-        "--no-color"
+        "--no-color",
     ]);
     
     cmd.assert()
@@ -85,12 +87,13 @@ fn test_case_insensitive_matching() {
 
     let mut cmd = Command::cargo_bin("logwatcher").unwrap();
     cmd.args(&[
-        "--file", 
+        "--file",
         temp_file.path().to_str().unwrap(),
         "--dry-run",
-        "--pattern", "ERROR",
+        "--pattern",
+        "ERROR",
         "--case-insensitive",
-        "--no-color"
+        "--no-color",
     ]);
     
     cmd.assert()
@@ -109,12 +112,13 @@ fn test_regex_matching() {
 
     let mut cmd = Command::cargo_bin("logwatcher").unwrap();
     cmd.args(&[
-        "--file", 
+        "--file",
         temp_file.path().to_str().unwrap(),
         "--dry-run",
-        "--pattern", r"user_id=\d+",
+        "--pattern",
+        r"user_id=\d+",
         "--regex",
-        "--no-color"
+        "--no-color",
     ]);
     
     cmd.assert()
@@ -136,11 +140,14 @@ fn test_multiple_files() {
 
     let mut cmd = Command::cargo_bin("logwatcher").unwrap();
     cmd.args(&[
-        "--file", temp_file1.path().to_str().unwrap(),
-        "--file", temp_file2.path().to_str().unwrap(),
+        "--file",
+        temp_file1.path().to_str().unwrap(),
+        "--file",
+        temp_file2.path().to_str().unwrap(),
         "--dry-run",
-        "--pattern", "ERROR",
-        "--no-color"
+        "--pattern",
+        "ERROR",
+        "--no-color",
     ]);
     
     cmd.assert()
@@ -158,12 +165,13 @@ fn test_invalid_regex() {
 
     let mut cmd = Command::cargo_bin("logwatcher").unwrap();
     cmd.args(&[
-        "--file", 
+        "--file",
         temp_file.path().to_str().unwrap(),
         "--dry-run",
-        "--pattern", "[invalid",
+        "--pattern",
+        "[invalid",
         "--regex",
-        "--no-color"
+        "--no-color",
     ]);
     
     cmd.assert()

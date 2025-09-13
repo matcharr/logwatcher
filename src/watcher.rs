@@ -173,20 +173,25 @@ impl LogWatcher {
                         last_size = new_size;
                         
                         for line in new_lines {
-                            if let Err(e) = tx_clone.send(FileEvent::NewLine {
-                                file_path: file_path_clone.clone(),
-                                line,
-                            }).await {
+                            if let Err(e) = tx_clone
+                                .send(FileEvent::NewLine {
+                                    file_path: file_path_clone.clone(),
+                                    line,
+                                })
+                                .await
+                            {
                                 error!("Failed to send line event: {}", e);
                                 break;
                             }
                         }
                     }
                 Err(e) => {
-                    let _ = tx_clone.send(FileEvent::FileError {
-                        file_path: file_path_clone.clone(),
-                        error: notify::Error::generic(&e.to_string()),
-                    }).await;
+                    let _ = tx_clone
+                        .send(FileEvent::FileError {
+                            file_path: file_path_clone.clone(),
+                            error: notify::Error::generic(&e.to_string()),
+                        })
+                        .await;
                     break;
                 }
                 }
