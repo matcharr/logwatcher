@@ -9,7 +9,7 @@ repository = "https://github.com/matcharr/logwatcher"
 homepage = "https://github.com/matcharr/logwatcher"
 documentation = "https://docs.rs/log-watcher"
 readme = "README.md"
-keywords = ["logs", "monitoring", "cli", "tail", "notifications", "file-watcher", "regex", "cross-platform"]
+keywords = ["logs", "monitoring", "cli", "tail", "notifications"]
 categories = ["command-line-utilities", "development-tools"]
 
 [lib]
