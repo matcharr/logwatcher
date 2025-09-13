@@ -639,11 +639,15 @@ mod tests {
         // Check if the result is ok, if not print the error for debugging
         if let Err(e) = &result {
             eprintln!("Notification test failed with error: {}", e);
-            // On macOS, notification system can only be initialized once per process
-            // If we get this specific error, it means notifications were attempted but failed due to system limitation
-            if e.to_string().contains("can only be set once") {
+            let error_msg = e.to_string();
+            // Handle different notification system errors across platforms
+            if error_msg.contains("can only be set once") || // macOS
+               error_msg.contains("org.freedesktop.DBus.Error.ServiceUnknown") || // Linux
+               error_msg.contains("not provided by any .service files") // Linux D-Bus
+            {
                 // This is expected behavior in test environment, so we consider it a success
-                assert_eq!(watcher.stats.notifications_sent, 0); // No notification was actually sent
+                // The notification counter is 0 because the notification failed before being sent
+                assert_eq!(watcher.stats.notifications_sent, 0);
                 return;
             }
         }
