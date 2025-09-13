@@ -217,4 +217,26 @@ mod tests {
         // In a real environment, this would succeed and truncate the line
         let _ = result;
     }
+
+    #[test]
+    fn test_get_notification_count() {
+        let config = create_test_config(true, 0);
+        let notifier = Notifier::new(config);
+        
+        let count = notifier.get_notification_count();
+        let count_value = count.blocking_lock();
+        assert_eq!(*count_value, 0);
+    }
+
+    #[tokio::test]
+    async fn test_notification_with_file_info() {
+        let config = create_test_config(true, 0);
+        let notifier = Notifier::new(config);
+
+        let result = notifier
+            .send_notification("ERROR", "Test error", Some("test.log"))
+            .await;
+        // May fail in test environment, but shouldn't panic
+        let _ = result;
+    }
 }

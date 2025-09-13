@@ -404,4 +404,72 @@ mod tests {
         assert_eq!(lines.len(), 1);
         assert_eq!(lines[0], "line 2");
     }
+
+    #[tokio::test]
+    async fn test_process_existing_file() {
+        let mut temp_file = NamedTempFile::new().unwrap();
+        writeln!(temp_file, "ERROR: Something went wrong").unwrap();
+        writeln!(temp_file, "INFO: Normal operation").unwrap();
+        temp_file.flush().unwrap();
+
+        let config = create_test_config();
+        let mut watcher = LogWatcher::new(config);
+
+        // Test processing existing file content
+        let result = watcher.process_existing_file(&temp_file.path().to_path_buf()).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_process_line() {
+        let mut temp_file = NamedTempFile::new().unwrap();
+        writeln!(temp_file, "ERROR: Test error").unwrap();
+        temp_file.flush().unwrap();
+
+        let config = create_test_config();
+        let mut watcher = LogWatcher::new(config);
+
+        // Test processing a line
+        let result = watcher.process_line(&temp_file.path(), "ERROR: Test error").await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_handle_file_rotation() {
+        let mut temp_file = NamedTempFile::new().unwrap();
+        writeln!(temp_file, "ERROR: Test error").unwrap();
+        temp_file.flush().unwrap();
+
+        let config = create_test_config();
+        let mut watcher = LogWatcher::new(config);
+
+        // Test file rotation handling
+        let result = watcher.handle_file_rotation(&temp_file.path()).await;
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_run_tail_mode() {
+        let mut temp_file = NamedTempFile::new().unwrap();
+        writeln!(temp_file, "ERROR: Test error").unwrap();
+        temp_file.flush().unwrap();
+
+        let config = create_test_config();
+        let mut watcher = LogWatcher::new(config);
+
+        // Test tail mode (short timeout to avoid hanging)
+        let rt = tokio::runtime::Runtime::new().unwrap();
+        let files = vec![temp_file.path().to_path_buf()];
+        
+        // Use a short timeout for testing
+        let result = rt.block_on(async {
+            tokio::time::timeout(
+                std::time::Duration::from_millis(100),
+                watcher.run_tail_mode(&files)
+            ).await
+        });
+        
+        // Should timeout (which is expected for this test)
+        assert!(result.is_err());
+    }
 }

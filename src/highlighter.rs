@@ -254,4 +254,66 @@ mod tests {
             .print_line("ERROR: Something went wrong", None, &match_result, true)
             .unwrap();
     }
+
+    #[test]
+    fn test_print_file_error() {
+        let config = create_test_config();
+        let mut highlighter = Highlighter::new(config);
+        let result = highlighter.print_file_error("test.log", "Permission denied");
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_print_shutdown_summary() {
+        let config = create_test_config();
+        let mut highlighter = Highlighter::new(config);
+        let stats = WatcherStats {
+            files_watched: 2,
+            lines_processed: 100,
+            matches_found: 5,
+            notifications_sent: 3,
+        };
+        let result = highlighter.print_shutdown_summary(&stats);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_print_file_rotation() {
+        let config = create_test_config();
+        let mut highlighter = Highlighter::new(config);
+        let result = highlighter.print_file_rotation("test.log");
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_print_file_reopened() {
+        let config = create_test_config();
+        let mut highlighter = Highlighter::new(config);
+        let result = highlighter.print_file_reopened("test.log");
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_print_startup_info() {
+        let config = create_test_config();
+        let mut highlighter = Highlighter::new(config);
+        let result = highlighter.print_startup_info();
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_print_colored_with_custom_color() {
+        let config = create_test_config();
+        let mut highlighter = Highlighter::new(config);
+        let result = highlighter.print_colored("Custom message", Color::Magenta);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_print_plain() {
+        let config = create_test_config();
+        let mut highlighter = Highlighter::new(config);
+        let result = highlighter.print_plain("Plain message");
+        assert!(result.is_ok());
+    }
 }
