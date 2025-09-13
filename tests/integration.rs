@@ -1,7 +1,7 @@
 use assert_cmd::Command;
 use predicates::prelude::*;
-use tempfile::NamedTempFile;
 use std::io::Write;
+use tempfile::NamedTempFile;
 
 #[test]
 fn test_help_output() {
@@ -46,7 +46,7 @@ fn test_dry_run_with_existing_file() {
         "ERROR",
         "--no-color",
     ]);
-    
+
     cmd.assert()
         .success()
         .stdout(predicate::str::contains("ERROR message").count(2))
@@ -71,7 +71,7 @@ fn test_quiet_mode() {
         "--quiet",
         "--no-color",
     ]);
-    
+
     cmd.assert()
         .success()
         .stdout(predicate::str::contains("normal message").not())
@@ -95,7 +95,7 @@ fn test_case_insensitive_matching() {
         "--case-insensitive",
         "--no-color",
     ]);
-    
+
     cmd.assert()
         .success()
         .stdout(predicate::str::contains("error message"))
@@ -120,7 +120,7 @@ fn test_regex_matching() {
         "--regex",
         "--no-color",
     ]);
-    
+
     cmd.assert()
         .success()
         .stdout(predicate::str::contains("user_id=12345"))
@@ -132,7 +132,7 @@ fn test_regex_matching() {
 fn test_multiple_files() {
     let mut temp_file1 = NamedTempFile::new().unwrap();
     let mut temp_file2 = NamedTempFile::new().unwrap();
-    
+
     writeln!(temp_file1, "ERROR in file1").unwrap();
     writeln!(temp_file2, "ERROR in file2").unwrap();
     temp_file1.flush().unwrap();
@@ -149,7 +149,7 @@ fn test_multiple_files() {
         "ERROR",
         "--no-color",
     ]);
-    
+
     cmd.assert()
         .success()
         .stdout(predicate::str::contains("[DRY-RUN]").count(2))
@@ -173,7 +173,7 @@ fn test_invalid_regex() {
         "--regex",
         "--no-color",
     ]);
-    
+
     cmd.assert()
         .failure()
         .stderr(predicate::str::contains("Invalid regex pattern"));

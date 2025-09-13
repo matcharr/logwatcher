@@ -58,7 +58,8 @@ impl Notifier {
         };
 
         // Send notification
-        self.send_desktop_notification(&title, &truncated_line).await?;
+        self.send_desktop_notification(&title, &truncated_line)
+            .await?;
 
         // Update throttling state
         self.update_throttle_state().await;
@@ -71,7 +72,7 @@ impl Notifier {
         let mut last_time = self.last_notification.lock().await;
 
         let now = Instant::now();
-        
+
         // Reset counter if we're in a new throttle window
         if now.duration_since(*last_time) >= self.throttle_window {
             *count = 0;
@@ -132,12 +133,8 @@ impl Notifier {
     }
 
     pub async fn test_notification(&self) -> Result<()> {
-        self.send_notification(
-            "TEST",
-            "LogWatcher notification test",
-            Some("test.log"),
-        )
-        .await
+        self.send_notification("TEST", "LogWatcher notification test", Some("test.log"))
+            .await
     }
 
     pub fn get_notification_count(&self) -> Arc<Mutex<u32>> {
@@ -175,8 +172,10 @@ mod tests {
     async fn test_notification_disabled() {
         let config = create_test_config(false, 5);
         let notifier = Notifier::new(config);
-        
-        let result = notifier.send_notification("ERROR", "Test message", None).await;
+
+        let result = notifier
+            .send_notification("ERROR", "Test message", None)
+            .await;
         // When notifications are disabled, this should always succeed
         assert!(result.is_ok());
     }
@@ -185,18 +184,24 @@ mod tests {
     async fn test_notification_throttling() {
         let config = create_test_config(true, 2);
         let notifier = Notifier::new(config);
-        
+
         // Send first notification
-        let result1 = notifier.send_notification("ERROR", "Test message 1", None).await;
+        let result1 = notifier
+            .send_notification("ERROR", "Test message 1", None)
+            .await;
         // In test environment, notifications might fail, so we just check it doesn't panic
         let _ = result1;
-        
+
         // Send second notification
-        let result2 = notifier.send_notification("ERROR", "Test message 2", None).await;
+        let result2 = notifier
+            .send_notification("ERROR", "Test message 2", None)
+            .await;
         let _ = result2;
-        
+
         // Third notification should be throttled (but still return Ok)
-        let result3 = notifier.send_notification("ERROR", "Test message 3", None).await;
+        let result3 = notifier
+            .send_notification("ERROR", "Test message 3", None)
+            .await;
         let _ = result3;
     }
 
@@ -204,7 +209,7 @@ mod tests {
     async fn test_line_truncation() {
         let config = create_test_config(true, 5);
         let notifier = Notifier::new(config);
-        
+
         let long_line = "a".repeat(250);
         let result = notifier.send_notification("ERROR", &long_line, None).await;
         // The notification might fail in test environment, so we just check it doesn't panic

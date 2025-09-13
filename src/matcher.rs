@@ -22,7 +22,7 @@ impl Matcher {
     pub fn new(config: Config) -> Self {
         let mut literal_patterns = Vec::new();
         let mut regex_patterns = Vec::new();
-        
+
         if config.regex_patterns.is_empty() {
             // Use literal patterns
             literal_patterns = config.patterns.clone();
@@ -66,7 +66,7 @@ impl Matcher {
             if search_line.contains(&search_pattern) {
                 let color = self.pattern_colors.get(pattern).copied();
                 let should_notify = self.config.should_notify_for_pattern(pattern);
-                
+
                 return MatchResult {
                     matched: true,
                     pattern: Some(pattern.clone()),
@@ -90,7 +90,7 @@ impl Matcher {
                 let pattern = self.config.patterns.get(i).cloned().unwrap_or_default();
                 let color = self.pattern_colors.get(&pattern).copied();
                 let should_notify = self.config.should_notify_for_pattern(&pattern);
-                
+
                 return MatchResult {
                     matched: true,
                     pattern: Some(pattern),
@@ -116,7 +116,7 @@ impl Matcher {
     /// Get all patterns that match a line
     pub fn get_all_matches(&self, line: &str) -> Vec<String> {
         let mut matches = Vec::new();
-        
+
         if self.config.regex_patterns.is_empty() {
             let search_line = if self.config.case_insensitive {
                 line.to_lowercase()

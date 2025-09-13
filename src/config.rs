@@ -27,7 +27,7 @@ impl Config {
     pub fn from_args(args: &Args) -> Result<Self> {
         let patterns = args.patterns();
         let notify_patterns = args.notify_patterns();
-        
+
         // Validate and compile regex patterns if needed
         let regex_patterns = if args.regex {
             Self::compile_regex_patterns(&patterns, args.case_insensitive)?
@@ -58,32 +58,32 @@ impl Config {
 
     fn compile_regex_patterns(patterns: &[String], case_insensitive: bool) -> Result<Vec<Regex>> {
         let mut compiled = Vec::new();
-        
+
         for pattern in patterns {
             let mut regex_builder = regex::RegexBuilder::new(pattern);
             regex_builder.case_insensitive(case_insensitive);
-            
+
             let regex = regex_builder
                 .build()
                 .with_context(|| format!("Invalid regex pattern: {}", pattern))?;
-            
+
             compiled.push(regex);
         }
-        
+
         Ok(compiled)
     }
 
     fn parse_color_mappings(mappings: &[(String, String)]) -> Result<HashMap<String, Color>> {
         let mut color_map = HashMap::new();
-        
+
         for (pattern, color_name) in mappings {
             let color = Self::parse_color(color_name)?;
             color_map.insert(pattern.clone(), color);
         }
-        
+
         // Add default color mappings if not specified
         Self::add_default_color_mappings(&mut color_map);
-        
+
         Ok(color_map)
     }
 

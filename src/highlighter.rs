@@ -66,7 +66,8 @@ impl Highlighter {
     }
 
     fn print_colored(&mut self, text: &str, color: Color) -> Result<()> {
-        self.stdout.set_color(ColorSpec::new().set_fg(Some(color)))?;
+        self.stdout
+            .set_color(ColorSpec::new().set_fg(Some(color)))?;
         writeln!(self.stdout, "{}", text)?;
         self.stdout.reset()?;
         self.stdout.flush()?;
@@ -80,7 +81,8 @@ impl Highlighter {
     }
 
     pub fn print_error(&mut self, message: &str) -> Result<()> {
-        self.stderr.set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
+        self.stderr
+            .set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
         writeln!(self.stderr, "Error: {}", message)?;
         self.stderr.reset()?;
         self.stderr.flush()?;
@@ -88,7 +90,8 @@ impl Highlighter {
     }
 
     pub fn print_warning(&mut self, message: &str) -> Result<()> {
-        self.stderr.set_color(ColorSpec::new().set_fg(Some(Color::Yellow)))?;
+        self.stderr
+            .set_color(ColorSpec::new().set_fg(Some(Color::Yellow)))?;
         writeln!(self.stderr, "Warning: {}", message)?;
         self.stderr.reset()?;
         self.stderr.flush()?;
@@ -96,7 +99,8 @@ impl Highlighter {
     }
 
     pub fn print_info(&mut self, message: &str) -> Result<()> {
-        self.stderr.set_color(ColorSpec::new().set_fg(Some(Color::Cyan)))?;
+        self.stderr
+            .set_color(ColorSpec::new().set_fg(Some(Color::Cyan)))?;
         writeln!(self.stderr, "Info: {}", message)?;
         self.stderr.reset()?;
         self.stderr.flush()?;
@@ -119,19 +123,19 @@ impl Highlighter {
 
     pub fn print_startup_info(&mut self) -> Result<()> {
         self.print_info(&format!("Watching {} file(s)", self.config.files.len()))?;
-        
+
         if !self.config.patterns.is_empty() {
             self.print_info(&format!("Patterns: {}", self.config.patterns.join(", ")))?;
         }
-        
+
         if self.config.notify_enabled {
             self.print_info("Desktop notifications enabled")?;
         }
-        
+
         if self.config.dry_run {
             self.print_info("Dry-run mode: reading existing content only")?;
         }
-        
+
         Ok(())
     }
 
@@ -155,7 +159,10 @@ impl Highlighter {
         self.print_plain(&format!("  Files watched: {}", stats.files_watched))?;
         self.print_plain(&format!("  Lines processed: {}", stats.lines_processed))?;
         self.print_plain(&format!("  Matches found: {}", stats.matches_found))?;
-        self.print_plain(&format!("  Notifications sent: {}", stats.notifications_sent))?;
+        self.print_plain(&format!(
+            "  Notifications sent: {}",
+            stats.notifications_sent
+        ))?;
         Ok(())
     }
 }
@@ -198,7 +205,7 @@ mod tests {
     fn test_print_line_without_match() {
         let config = create_test_config();
         let mut highlighter = Highlighter::new(config);
-        
+
         let match_result = MatchResult {
             matched: false,
             pattern: None,
@@ -207,14 +214,16 @@ mod tests {
         };
 
         // This should not panic
-        highlighter.print_line("Normal line", None, &match_result, false).unwrap();
+        highlighter
+            .print_line("Normal line", None, &match_result, false)
+            .unwrap();
     }
 
     #[test]
     fn test_print_line_with_match() {
         let config = create_test_config();
         let mut highlighter = Highlighter::new(config);
-        
+
         let match_result = MatchResult {
             matched: true,
             pattern: Some("ERROR".to_string()),
@@ -223,14 +232,16 @@ mod tests {
         };
 
         // This should not panic
-        highlighter.print_line("ERROR: Something went wrong", None, &match_result, false).unwrap();
+        highlighter
+            .print_line("ERROR: Something went wrong", None, &match_result, false)
+            .unwrap();
     }
 
     #[test]
     fn test_dry_run_prefix() {
         let config = create_test_config();
         let mut highlighter = Highlighter::new(config);
-        
+
         let match_result = MatchResult {
             matched: true,
             pattern: Some("ERROR".to_string()),
@@ -239,6 +250,8 @@ mod tests {
         };
 
         // This should not panic
-        highlighter.print_line("ERROR: Something went wrong", None, &match_result, true).unwrap();
+        highlighter
+            .print_line("ERROR: Something went wrong", None, &match_result, true)
+            .unwrap();
     }
 }

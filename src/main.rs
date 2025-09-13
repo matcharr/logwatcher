@@ -23,7 +23,7 @@ async fn main() {
 
     // Create and run the log watcher
     let mut watcher = LogWatcher::new(config);
-    
+
     match watcher.run().await {
         Ok(_) => {
             info!("LogWatcher completed successfully");

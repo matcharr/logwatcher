@@ -4,23 +4,20 @@ use std::io::{BufRead, BufReader};
 use std::path::Path;
 
 /// Read all lines from a file
-pub fn read_file_from_end<P: AsRef<Path>>(
-    path: P,
-    _buffer_size: usize,
-) -> Result<Vec<String>> {
+pub fn read_file_from_end<P: AsRef<Path>>(path: P, _buffer_size: usize) -> Result<Vec<String>> {
     let file = File::open(&path)
         .with_context(|| format!("Failed to open file: {}", path.as_ref().display()))?;
-    
+
     let reader = BufReader::new(file);
     let mut lines = Vec::new();
-    
+
     for line_result in reader.lines() {
         let line = line_result?;
         if !line.trim().is_empty() {
             lines.push(line.trim().to_string());
         }
     }
-    
+
     Ok(lines)
 }
 
@@ -31,8 +28,7 @@ pub fn is_file_readable<P: AsRef<Path>>(path: P) -> bool {
 
 /// Get file size
 pub fn get_file_size<P: AsRef<Path>>(path: P) -> Result<u64> {
-    let metadata = std::fs::metadata(path)
-        .with_context(|| "Failed to get file metadata")?;
+    let metadata = std::fs::metadata(path).with_context(|| "Failed to get file metadata")?;
     Ok(metadata.len())
 }
 
@@ -46,7 +42,7 @@ pub fn is_file_rotated<P: AsRef<Path>>(path: P, previous_size: u64) -> Result<bo
 pub fn validate_files<P: AsRef<Path> + Clone>(files: &[P]) -> Result<Vec<P>> {
     let mut valid_files = Vec::new();
     let mut errors = Vec::new();
-    
+
     for file in files {
         if is_file_readable(file) {
             valid_files.push(file.clone());
@@ -54,15 +50,21 @@ pub fn validate_files<P: AsRef<Path> + Clone>(files: &[P]) -> Result<Vec<P>> {
             errors.push(format!("File not readable: {}", file.as_ref().display()));
         }
     }
-    
+
     if valid_files.is_empty() {
-        return Err(anyhow::anyhow!("No valid files to watch: {}", errors.join(", ")));
+        return Err(anyhow::anyhow!(
+            "No valid files to watch: {}",
+            errors.join(", ")
+        ));
     }
-    
+
     if !errors.is_empty() {
-        eprintln!("Warning: Some files are not accessible: {}", errors.join(", "));
+        eprintln!(
+            "Warning: Some files are not accessible: {}",
+            errors.join(", ")
+        );
     }
-    
+
     Ok(valid_files)
 }
 
@@ -71,12 +73,12 @@ pub fn format_file_size(size: u64) -> String {
     const UNITS: &[&str] = &["B", "KB", "MB", "GB", "TB"];
     let mut size = size as f64;
     let mut unit_index = 0;
-    
+
     while size >= 1024.0 && unit_index < UNITS.len() - 1 {
         size /= 1024.0;
         unit_index += 1;
     }
-    
+
     if unit_index == 0 {
         format!("{} {}", size as u64, UNITS[unit_index])
     } else {
@@ -95,14 +97,17 @@ pub fn get_filename<P: AsRef<Path>>(path: P) -> String {
 
 /// Check if a path is a symlink
 pub fn is_symlink<P: AsRef<Path>>(path: P) -> bool {
-    path.as_ref().symlink_metadata()
+    path.as_ref()
+        .symlink_metadata()
         .map(|metadata| metadata.file_type().is_symlink())
         .unwrap_or(false)
 }
 
 /// Resolve symlink to actual path
 pub fn resolve_symlink<P: AsRef<Path>>(path: P) -> Result<std::path::PathBuf> {
-    let resolved = path.as_ref().read_link()
+    let resolved = path
+        .as_ref()
+        .read_link()
         .with_context(|| format!("Failed to read symlink: {}", path.as_ref().display()))?;
     Ok(resolved)
 }
@@ -110,8 +115,8 @@ pub fn resolve_symlink<P: AsRef<Path>>(path: P) -> Result<std::path::PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::NamedTempFile;
     use std::io::Write;
+    use tempfile::NamedTempFile;
 
     #[test]
     fn test_format_file_size() {
@@ -133,13 +138,13 @@ mod tests {
         // Create a temporary file
         let temp_file = NamedTempFile::new().unwrap();
         let temp_path = temp_file.path();
-        
+
         // Test with valid file
         let valid_files = vec![temp_path];
         let result = validate_files(&valid_files);
         assert!(result.is_ok());
         assert_eq!(result.unwrap().len(), 1);
-        
+
         // Test with invalid file
         let invalid_files = vec![std::path::Path::new("/nonexistent/file.log")];
         let result = validate_files(&invalid_files);
@@ -153,7 +158,7 @@ mod tests {
         writeln!(temp_file, "line 2").unwrap();
         writeln!(temp_file, "line 3").unwrap();
         temp_file.flush().unwrap();
-        
+
         let lines = read_file_from_end(temp_file.path(), 1024).unwrap();
         assert_eq!(lines.len(), 3);
         assert_eq!(lines[0], "line 1");

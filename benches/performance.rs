@@ -1,7 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use logwatcher::cli::Args;
 use logwatcher::config::Config;
 use logwatcher::matcher::Matcher;
-use logwatcher::cli::Args;
 use std::path::PathBuf;
 
 fn create_test_config(patterns: &str, regex: bool) -> Config {
@@ -27,7 +27,7 @@ fn create_test_config(patterns: &str, regex: bool) -> Config {
 fn benchmark_literal_matching(c: &mut Criterion) {
     let config = create_test_config("ERROR,WARN,INFO", false);
     let matcher = Matcher::new(config);
-    
+
     let test_lines = vec![
         "This is a normal log line",
         "ERROR: Something went wrong",
@@ -49,7 +49,7 @@ fn benchmark_literal_matching(c: &mut Criterion) {
 fn benchmark_regex_matching(c: &mut Criterion) {
     let config = create_test_config(r"user_id=\d+|session_\w+|error_\d+", true);
     let matcher = Matcher::new(config);
-    
+
     let test_lines = vec![
         "Login successful for user_id=12345",
         "Session created: session_abc123",
@@ -73,7 +73,7 @@ fn benchmark_case_insensitive_matching(c: &mut Criterion) {
     let mut config = config;
     config.case_insensitive = true;
     let matcher = Matcher::new(config);
-    
+
     let test_lines = vec![
         "This is a normal log line",
         "error: Something went wrong",
@@ -95,7 +95,7 @@ fn benchmark_case_insensitive_matching(c: &mut Criterion) {
 fn benchmark_multiple_patterns(c: &mut Criterion) {
     let config = create_test_config("ERROR,WARN,INFO,DEBUG,TRACE,FATAL,CRITICAL", false);
     let matcher = Matcher::new(config);
-    
+
     let test_lines = vec![
         "This is a normal log line",
         "ERROR: Critical error occurred",
@@ -119,9 +119,9 @@ fn benchmark_multiple_patterns(c: &mut Criterion) {
 fn benchmark_long_line_matching(c: &mut Criterion) {
     let config = create_test_config("ERROR", false);
     let matcher = Matcher::new(config);
-    
+
     let long_line = "This is a very long log line that contains a lot of information about what happened in the system. It includes details about the request, the user, the timestamp, and various other metadata. ERROR: Something went wrong in the middle of this long line. The rest of the line continues with more information about the context and the state of the system at the time of the error.";
-    
+
     let test_lines = vec![long_line; 100];
 
     c.bench_function("long_line_matching", |b| {
