@@ -643,7 +643,8 @@ mod tests {
             // Handle different notification system errors across platforms
             if error_msg.contains("can only be set once") || // macOS
                error_msg.contains("org.freedesktop.DBus.Error.ServiceUnknown") || // Linux
-               error_msg.contains("not provided by any .service files") // Linux D-Bus
+               error_msg.contains("not provided by any .service files")
+            // Linux D-Bus
             {
                 // This is expected behavior in test environment, so we consider it a success
                 // The notification counter is 0 because the notification failed before being sent
