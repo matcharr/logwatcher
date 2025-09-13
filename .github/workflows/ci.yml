@@ -173,19 +173,26 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
 
+      - name: List downloaded files
+        run: |
+          find . -name "*.tar.gz" -o -name "*.zip" | head -10
+
       - name: Create checksums
         run: |
-          for file in *.tar.gz *.zip; do
-            sha256sum "$file" > "$file.sha256"
+          find . -name "*.tar.gz" -o -name "*.zip" | while read file; do
+            if [ -f "$file" ]; then
+              sha256sum "$file" > "$file.sha256"
+              echo "Created checksum for: $file"
+            fi
           done
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            *.tar.gz
-            *.zip
-            *.sha256
+            **/*.tar.gz
+            **/*.zip
+            **/*.sha256
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
