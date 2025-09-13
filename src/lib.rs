@@ -6,7 +6,7 @@ pub mod notifier;
 pub mod utils;
 pub mod watcher;
 
-// ✅ GPG signing fixed - using correct key D910D77A22D928D6
+// 🔐 SSH key signing enabled - much more reliable!
 
 pub use cli::Args;
 pub use config::Config;
