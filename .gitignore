@@ -1,5 +1,6 @@
 # Rust
 /target/
+**/*.rs.bk
 Cargo.lock
 
 # IDE
@@ -15,19 +16,10 @@ Thumbs.db
 
 # Logs
 *.log
-test.log
-myapp.log
 
-# Test files
-test_output/
-temp_*
-
-# Build artifacts
-*.pdb
-*.exe
-*.dll
-*.so
-*.dylib
+# Temporary files
+*.tmp
+*.temp
 
 # Coverage reports
 tarpaulin-report.html
@@ -35,3 +27,7 @@ lcov.info
 
 # Benchmark results
 criterion/
+
+# Environment files
+.env
+.env.local

@@ -6,7 +6,10 @@ authors = ["Mathis Charretier <mathis.charretier@protonmail.com>"]
 description = "Real-time log file monitoring with pattern highlighting and desktop notifications"
 license = "MIT"
 repository = "https://github.com/matcharr/logwatcher"
-keywords = ["logs", "monitoring", "cli", "tail", "notifications"]
+homepage = "https://github.com/matcharr/logwatcher"
+documentation = "https://docs.rs/log-watcher"
+readme = "README.md"
+keywords = ["logs", "monitoring", "cli", "tail", "notifications", "file-watcher", "regex", "cross-platform"]
 categories = ["command-line-utilities", "development-tools"]
 
 [lib]
