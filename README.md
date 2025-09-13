@@ -307,7 +307,7 @@ LogWatcher has comprehensive test coverage:
 - **Unit Tests**: Core component testing (matcher, highlighter, notifier, watcher, etc.)
 - **Performance Benchmarks**: Real performance measurements
 - **Cross-platform Testing**: Linux, macOS, Windows
-- **Coverage**: 81.54% (above 80% professional standard)
+- **Coverage**: 80.84% (above 80% professional standard)
 
 ### Running Tests
 
