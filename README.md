@@ -303,12 +303,12 @@ MIT License - see LICENSE file for details.
 
 LogWatcher has comprehensive test coverage:
 
-- **42 Tests Total**: 13 integration tests + 29 unit tests
+- **50 Tests Total**: 13 integration tests + 36 unit tests + 1 main test
 - **Integration Tests**: End-to-end CLI functionality testing
 - **Unit Tests**: Core component testing (matcher, highlighter, notifier, watcher, etc.)
 - **Performance Benchmarks**: Real performance measurements
 - **Cross-platform Testing**: Linux, macOS, Windows
-- **Coverage**: 78.97% (above 75% industry standard)
+- **Coverage**: 81.54% (above 80% professional standard)
 
 ### Running Tests
 

@@ -122,3 +122,31 @@ impl Args {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_color_mappings_invalid_format() {
+        let args = Args {
+            files: vec![PathBuf::from("test.log")],
+            patterns: "ERROR".to_string(),
+            regex: false,
+            case_insensitive: false,
+            color_map: Some("invalid_format".to_string()),
+            notify: false,
+            notify_patterns: None,
+            quiet: false,
+            dry_run: false,
+            prefix_file: Some(false),
+            poll_interval: 1000,
+            buffer_size: 8192,
+            no_color: false,
+            notify_throttle: 0,
+        };
+
+        let mappings = args.color_mappings();
+        assert_eq!(mappings.len(), 0); // Should return empty map for invalid format
+    }
+}

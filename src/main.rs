@@ -35,3 +35,20 @@ async fn main() {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::process::Command;
+
+    #[test]
+    fn test_main_with_invalid_args() {
+        // Test that main handles invalid arguments gracefully
+        let output = Command::new("cargo")
+            .args(&["run", "--", "--invalid-flag"])
+            .output()
+            .expect("Failed to execute command");
+        
+        // Should exit with non-zero code for invalid args
+        assert!(!output.status.success());
+    }
+}

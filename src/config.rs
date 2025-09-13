@@ -128,3 +128,46 @@ impl Config {
         self.color_mappings.get(pattern).copied()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_all_color_parsing() {
+        // Test all color mappings to cover the uncovered lines
+        assert_eq!(Config::parse_color("yellow").unwrap(), Color::Yellow);
+        assert_eq!(Config::parse_color("magenta").unwrap(), Color::Magenta);
+        assert_eq!(Config::parse_color("cyan").unwrap(), Color::Cyan);
+        assert_eq!(Config::parse_color("white").unwrap(), Color::White);
+    }
+
+    #[test]
+    fn test_get_color_for_pattern() {
+        let args = Args {
+            files: vec![PathBuf::from("test.log")],
+            patterns: "ERROR".to_string(),
+            regex: false,
+            case_insensitive: false,
+            color_map: None,
+            notify: false,
+            notify_patterns: None,
+            quiet: false,
+            dry_run: false,
+            prefix_file: Some(false),
+            poll_interval: 1000,
+            buffer_size: 8192,
+            no_color: false,
+            notify_throttle: 0,
+        };
+        
+        let config = Config::from_args(&args).unwrap();
+        
+        // Test that default color mappings work
+        assert_eq!(config.get_color_for_pattern("ERROR"), Some(Color::Red));
+        assert_eq!(config.get_color_for_pattern("WARN"), Some(Color::Yellow));
+        assert_eq!(config.get_color_for_pattern("INFO"), Some(Color::Green));
+        assert_eq!(config.get_color_for_pattern("DEBUG"), Some(Color::Cyan));
+        assert_eq!(config.get_color_for_pattern("UNKNOWN"), None);
+    }
+}
