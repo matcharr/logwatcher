@@ -165,4 +165,177 @@ mod tests {
         assert_eq!(lines[1], "line 2");
         assert_eq!(lines[2], "line 3");
     }
+
+    #[test]
+    fn test_read_file_from_end_with_empty_lines() {
+        let mut temp_file = NamedTempFile::new().unwrap();
+        writeln!(temp_file, "line 1").unwrap();
+        writeln!(temp_file).unwrap(); // Empty line
+        writeln!(temp_file, "   ").unwrap(); // Whitespace only line
+        writeln!(temp_file, "line 2").unwrap();
+        temp_file.flush().unwrap();
+
+        let lines = read_file_from_end(temp_file.path(), 1024).unwrap();
+        assert_eq!(lines.len(), 2); // Empty lines should be filtered out
+        assert_eq!(lines[0], "line 1");
+        assert_eq!(lines[1], "line 2");
+    }
+
+    #[test]
+    fn test_read_file_from_end_with_nonexistent_file() {
+        let result = read_file_from_end("/nonexistent/file.log", 1024);
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("Failed to open file"));
+    }
+
+    #[test]
+    fn test_is_file_readable() {
+        let temp_file = NamedTempFile::new().unwrap();
+        assert!(is_file_readable(temp_file.path()));
+
+        assert!(!is_file_readable("/nonexistent/file.log"));
+    }
+
+    #[test]
+    fn test_get_file_size() {
+        let mut temp_file = NamedTempFile::new().unwrap();
+        writeln!(temp_file, "test content").unwrap();
+        temp_file.flush().unwrap();
+
+        let size = get_file_size(temp_file.path()).unwrap();
+        assert!(size > 0);
+    }
+
+    #[test]
+    fn test_get_file_size_nonexistent() {
+        let result = get_file_size("/nonexistent/file.log");
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("Failed to get file metadata"));
+    }
+
+    #[test]
+    fn test_is_file_rotated() {
+        let mut temp_file = NamedTempFile::new().unwrap();
+        writeln!(temp_file, "initial content").unwrap();
+        temp_file.flush().unwrap();
+
+        let initial_size = get_file_size(temp_file.path()).unwrap();
+
+        // Add more content
+        writeln!(temp_file, "more content").unwrap();
+        temp_file.flush().unwrap();
+
+        // File should not be rotated (size increased)
+        assert!(!is_file_rotated(temp_file.path(), initial_size).unwrap());
+
+        // Simulate file rotation by truncating
+        temp_file.as_file_mut().set_len(0).unwrap();
+        temp_file.flush().unwrap();
+
+        // File should be detected as rotated (size decreased)
+        assert!(is_file_rotated(temp_file.path(), initial_size).unwrap());
+    }
+
+    #[test]
+    fn test_validate_files_with_mixed_validity() {
+        let temp_file = NamedTempFile::new().unwrap();
+        let temp_path = temp_file.path();
+
+        let files = vec![
+            temp_path,
+            std::path::Path::new("/nonexistent/file1.log"),
+            std::path::Path::new("/nonexistent/file2.log"),
+        ];
+
+        let result = validate_files(&files);
+        assert!(result.is_ok());
+
+        let valid_files = result.unwrap();
+        assert_eq!(valid_files.len(), 1);
+        assert_eq!(valid_files[0], temp_path);
+    }
+
+    #[test]
+    fn test_validate_files_all_invalid() {
+        let files = vec![
+            std::path::Path::new("/nonexistent/file1.log"),
+            std::path::Path::new("/nonexistent/file2.log"),
+        ];
+
+        let result = validate_files(&files);
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("No valid files to watch"));
+    }
+
+    #[test]
+    fn test_format_file_size_edge_cases() {
+        // Test bytes
+        assert_eq!(format_file_size(0), "0 B");
+        assert_eq!(format_file_size(1), "1 B");
+        assert_eq!(format_file_size(1023), "1023 B");
+
+        // Test kilobytes
+        assert_eq!(format_file_size(1024), "1.0 KB");
+        assert_eq!(format_file_size(1536), "1.5 KB");
+        assert_eq!(format_file_size(2048), "2.0 KB");
+
+        // Test megabytes
+        assert_eq!(format_file_size(1048576), "1.0 MB");
+        assert_eq!(format_file_size(1572864), "1.5 MB");
+
+        // Test gigabytes
+        assert_eq!(format_file_size(1073741824), "1.0 GB");
+
+        // Test terabytes
+        assert_eq!(format_file_size(1099511627776), "1.0 TB");
+    }
+
+    #[test]
+    fn test_get_filename_edge_cases() {
+        assert_eq!(get_filename("/path/to/file.log"), "file.log");
+        assert_eq!(get_filename("file.log"), "file.log");
+        assert_eq!(get_filename("/"), "unknown");
+        assert_eq!(get_filename(""), "unknown");
+        // For paths ending with /, the last component is actually "to", not "unknown"
+        assert_eq!(get_filename("/path/to/"), "to");
+    }
+
+    #[test]
+    fn test_is_symlink() {
+        // Test regular file
+        let temp_file = NamedTempFile::new().unwrap();
+        assert!(!is_symlink(temp_file.path()));
+
+        // Test nonexistent file
+        assert!(!is_symlink("/nonexistent/file.log"));
+    }
+
+    #[test]
+    fn test_resolve_symlink() {
+        // Test with regular file (not a symlink)
+        let temp_file = NamedTempFile::new().unwrap();
+        let result = resolve_symlink(temp_file.path());
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("Failed to read symlink"));
+
+        // Test with nonexistent file
+        let result = resolve_symlink("/nonexistent/file.log");
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("Failed to read symlink"));
+    }
 }
