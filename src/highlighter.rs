@@ -56,8 +56,8 @@ impl Highlighter {
         output_line.push_str(line);
 
         // Print with or without color
-        if match_result.matched && match_result.color.is_some() {
-            self.print_colored(&output_line, match_result.color.unwrap())?;
+        if let Some(color) = match_result.color {
+            self.print_colored(&output_line, color)?;
         } else {
             self.print_plain(&output_line)?;
         }
