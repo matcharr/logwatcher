@@ -243,6 +243,12 @@ impl LogWatcher {
         for line_result in reader.lines() {
             let line = line_result?;
             self.stats.lines_processed += 1;
+
+            // Check if line should be excluded
+            if self.config.should_exclude(&line) {
+                continue;
+            }
+
             let match_result = self.matcher.match_line(&line);
 
             if match_result.matched {
@@ -265,6 +271,11 @@ impl LogWatcher {
 
     async fn process_line(&mut self, file_path: &Path, line: &str) -> Result<()> {
         self.stats.lines_processed += 1;
+
+        // Check if line should be excluded
+        if self.config.should_exclude(line) {
+            return Ok(());
+        }
 
         let match_result = self.matcher.match_line(line);
 

@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.0] - 2025-09-13
 
 ### Added
+- **Exclude patterns** (`--exclude` / `-e`) for inverse matching - filter out noisy log entries
+- **Shell completions** (`--completions`) for bash, zsh, fish, and PowerShell
+- **Docker support** with multi-stage Dockerfile for containerized deployment
+- **ReDoS protection** with regex size limits to prevent catastrophic backtracking
 - **Exceptional test coverage: 90.65%** (388/428 lines covered)
 - Comprehensive test suite with 114 unit tests + 13 integration tests
 - Performance benchmarks with detailed metrics
@@ -25,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Major version bump** reflecting significant improvements
+- Version now correctly reported from Cargo.toml using `env!("CARGO_PKG_VERSION")`
 - Updated performance claims with actual benchmark results
 - Improved documentation and examples
 - Enhanced CLI interface with better argument handling
@@ -32,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Better error messages and user feedback
 
 ### Fixed
+- Version mismatch between CLI and Cargo.toml (was showing 0.1.0 instead of 0.2.0)
 - Cross-platform compatibility issues
 - Memory leaks in long-running processes
 - File handle management during rotation
