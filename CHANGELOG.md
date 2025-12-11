@@ -5,6 +5,21 @@ All notable changes to LogWatcher will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2025-12-11
+
+### Changed
+- **Performance optimization**: Pre-compute lowercase exclude patterns at config init
+- **Better statistics**: Added `lines_excluded` counter for visibility into filtering
+- **Improved accuracy**: `lines_processed` now only counts non-excluded lines
+- Updated dependencies: `notify` 6→8, `crossterm` 0.27→0.29
+
+### Fixed
+- Clippy `unnecessary_unwrap` lint (compatibility with beta Rust)
+- CI formatting and linting issues
+
+### Documentation
+- Added Zsh fpath setup instructions for shell completions
+
 ## [0.2.0] - 2025-09-13
 
 ### Added

@@ -21,7 +21,7 @@ fn test_version_output() {
     cmd.arg("--version");
     cmd.assert()
         .success()
-        .stdout(predicate::str::contains("logwatcher 0.2.0"));
+        .stdout(predicate::str::contains("logwatcher 0.2.1"));
 }
 
 #[test]
