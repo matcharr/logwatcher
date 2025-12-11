@@ -385,6 +385,13 @@ Coverage reports are automatically generated and uploaded to [Codecov](https://c
 
 ## Changelog
 
+### v0.2.1
+- **Perf:** Pre-compute lowercase exclude patterns at config init
+- **New:** `lines_excluded` counter for better stats visibility
+- **Fix:** Clippy `unnecessary_unwrap` lint (beta Rust compatibility)
+- **Deps:** Updated `notify` 6→8, `crossterm` 0.27→0.29
+- **Docs:** Added Zsh fpath setup instructions
+
 ### v0.2.0
 - **New:** Exclude patterns (`--exclude` / `-e`) for inverse matching
 - **New:** Shell completions (`--completions`) for bash, zsh, fish, PowerShell
