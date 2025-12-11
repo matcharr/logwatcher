@@ -659,7 +659,8 @@ mod tests {
                error_msg.contains(".service files") || // Linux D-Bus (various error formats)
                error_msg.contains("Notifications") || // Linux D-Bus notification service
                error_msg.contains("No such file or directory") || // Missing notification daemon
-               error_msg.contains("I/O error") // General I/O errors for notifications
+               error_msg.contains("I/O error")
+            // General I/O errors for notifications
             {
                 // This is expected behavior in test environment, so we consider it a success
                 // The notification counter is 0 because the notification failed before being sent
@@ -1264,7 +1265,8 @@ mod tests {
                error_msg.contains(".service files") || // Linux D-Bus (various error formats)
                error_msg.contains("Notifications") || // Linux D-Bus notification service
                error_msg.contains("No such file or directory") || // Missing notification daemon
-               error_msg.contains("I/O error") // General I/O errors for notifications
+               error_msg.contains("I/O error")
+            // General I/O errors for notifications
             {
                 // This is expected behavior in test environment, so we consider it a success
                 // The notification counter is 0 because the notification failed before being sent
@@ -1360,7 +1362,8 @@ mod tests {
                error_msg.contains(".service files") || // Linux D-Bus (various error formats)
                error_msg.contains("Notifications") || // Linux D-Bus notification service
                error_msg.contains("No such file or directory") || // Missing notification daemon
-               error_msg.contains("I/O error") // General I/O errors for notifications
+               error_msg.contains("I/O error")
+            // General I/O errors for notifications
             {
                 // This is expected behavior in test environment, so we consider it a success
                 // The notification counter is 0 because the notification failed before being sent
@@ -1534,7 +1537,8 @@ mod tests {
                error_msg.contains(".service files") || // Linux D-Bus (various error formats)
                error_msg.contains("Notifications") || // Linux D-Bus notification service
                error_msg.contains("No such file or directory") || // Missing notification daemon
-               error_msg.contains("I/O error") // General I/O errors for notifications
+               error_msg.contains("I/O error")
+            // General I/O errors for notifications
             {
                 // This is expected behavior in test environment, so we consider it a success
                 // The notification counter is 0 because the notification failed before being sent

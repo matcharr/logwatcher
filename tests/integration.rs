@@ -1,3 +1,6 @@
+// Allow deprecated cargo_bin - it still works for our use case
+#![allow(deprecated)]
+
 use assert_cmd::Command;
 use predicates::prelude::*;
 use std::io::Write;
@@ -174,9 +177,9 @@ fn test_invalid_regex() {
         "--no-color",
     ]);
 
-    cmd.assert()
-        .failure()
-        .stderr(predicate::str::contains("Invalid or too complex regex pattern"));
+    cmd.assert().failure().stderr(predicate::str::contains(
+        "Invalid or too complex regex pattern",
+    ));
 }
 
 #[test]
