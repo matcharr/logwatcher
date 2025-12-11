@@ -1,17 +1,23 @@
-use clap::Parser;
+use clap::{CommandFactory, Parser};
+use clap_complete::{generate, Shell};
+use std::io;
 use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(
     name = "logwatcher",
     about = "Real-time log file monitoring with pattern highlighting and desktop notifications",
-    version = "0.1.0",
+    version = env!("CARGO_PKG_VERSION"),
     long_about = "LogWatcher is a CLI tool for monitoring log files in real-time. It provides pattern highlighting, desktop notifications, and handles file rotation automatically."
 )]
 pub struct Args {
     /// Path(s) to log file(s) to watch
-    #[arg(short = 'f', long = "file", required = true, num_args = 1..)]
+    #[arg(short = 'f', long = "file", required_unless_present = "completions", num_args = 1..)]
     pub files: Vec<PathBuf>,
+
+    /// Generate shell completions for the specified shell
+    #[arg(long = "completions", value_name = "SHELL")]
+    pub completions: Option<Shell>,
 
     /// Comma-separated patterns to match
     #[arg(short = 'p', long = "pattern", default_value = "ERROR,WARN")]
@@ -48,6 +54,10 @@ pub struct Args {
     /// Suppress non-matching lines
     #[arg(short = 'q', long = "quiet")]
     pub quiet: bool,
+
+    /// Comma-separated patterns to exclude (inverse matching)
+    #[arg(short = 'e', long = "exclude")]
+    pub exclude: Option<String>,
 
     /// Disable ANSI colors
     #[arg(long = "no-color")]
@@ -121,6 +131,25 @@ impl Args {
             self.files.len() > 1
         }
     }
+
+    /// Get exclude patterns as a vector of strings
+    pub fn exclude_patterns(&self) -> Vec<String> {
+        if let Some(ref patterns) = self.exclude {
+            patterns
+                .split(',')
+                .map(|s| s.trim().to_string())
+                .filter(|s| !s.is_empty())
+                .collect()
+        } else {
+            vec![]
+        }
+    }
+
+    /// Generate shell completions for the specified shell and write to stdout
+    pub fn generate_completions(shell: Shell) {
+        let mut cmd = Args::command();
+        generate(shell, &mut cmd, "logwatcher", &mut io::stdout());
+    }
 }
 
 #[cfg(test)]
@@ -131,6 +160,7 @@ mod tests {
     fn test_color_mappings_invalid_format() {
         let args = Args {
             files: vec![PathBuf::from("test.log")],
+            completions: None,
             patterns: "ERROR".to_string(),
             regex: false,
             case_insensitive: false,
@@ -139,6 +169,7 @@ mod tests {
             notify_patterns: None,
             quiet: false,
             dry_run: false,
+            exclude: None,
             prefix_file: Some(false),
             poll_interval: 1000,
             buffer_size: 8192,
@@ -148,5 +179,65 @@ mod tests {
 
         let mappings = args.color_mappings();
         assert_eq!(mappings.len(), 0); // Should return empty map for invalid format
+    }
+
+    #[test]
+    fn test_exclude_patterns() {
+        let args = Args {
+            files: vec![PathBuf::from("test.log")],
+            completions: None,
+            patterns: "ERROR".to_string(),
+            regex: false,
+            case_insensitive: false,
+            color_map: None,
+            notify: false,
+            notify_patterns: None,
+            quiet: false,
+            dry_run: false,
+            exclude: Some("DEBUG,TRACE".to_string()),
+            prefix_file: Some(false),
+            poll_interval: 1000,
+            buffer_size: 8192,
+            no_color: false,
+            notify_throttle: 0,
+        };
+
+        let patterns = args.exclude_patterns();
+        assert_eq!(patterns.len(), 2);
+        assert!(patterns.contains(&"DEBUG".to_string()));
+        assert!(patterns.contains(&"TRACE".to_string()));
+    }
+
+    #[test]
+    fn test_exclude_patterns_empty() {
+        let args = Args {
+            files: vec![PathBuf::from("test.log")],
+            completions: None,
+            patterns: "ERROR".to_string(),
+            regex: false,
+            case_insensitive: false,
+            color_map: None,
+            notify: false,
+            notify_patterns: None,
+            quiet: false,
+            dry_run: false,
+            exclude: None,
+            prefix_file: Some(false),
+            poll_interval: 1000,
+            buffer_size: 8192,
+            no_color: false,
+            notify_throttle: 0,
+        };
+
+        let patterns = args.exclude_patterns();
+        assert!(patterns.is_empty());
+    }
+
+    #[test]
+    fn test_generate_completions() {
+        // Just verify the function doesn't panic
+        // We can't easily capture stdout in a unit test, but we can test it runs
+        use clap_complete::Shell;
+        Args::generate_completions(Shell::Bash);
     }
 }

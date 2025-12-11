@@ -18,7 +18,7 @@ fn test_version_output() {
     cmd.arg("--version");
     cmd.assert()
         .success()
-        .stdout(predicate::str::contains("logwatcher 0.1.0"));
+        .stdout(predicate::str::contains("logwatcher 0.2.0"));
 }
 
 #[test]
@@ -176,7 +176,7 @@ fn test_invalid_regex() {
 
     cmd.assert()
         .failure()
-        .stderr(predicate::str::contains("Invalid regex pattern"));
+        .stderr(predicate::str::contains("Invalid or too complex regex pattern"));
 }
 
 #[test]

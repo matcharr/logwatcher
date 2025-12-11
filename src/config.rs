@@ -5,11 +5,16 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use termcolor::Color;
 
+/// Maximum size limit for regex patterns to prevent ReDoS attacks
+const REGEX_SIZE_LIMIT: usize = 10 * 1024 * 1024; // 10 MB
+
 #[derive(Debug, Clone)]
 pub struct Config {
     pub files: Vec<PathBuf>,
     pub patterns: Vec<String>,
     pub regex_patterns: Vec<Regex>,
+    pub exclude_patterns: Vec<String>,
+    pub exclude_regex_patterns: Vec<Regex>,
     pub case_insensitive: bool,
     pub color_mappings: HashMap<String, Color>,
     pub notify_enabled: bool,
@@ -27,10 +32,18 @@ impl Config {
     pub fn from_args(args: &Args) -> Result<Self> {
         let patterns = args.patterns();
         let notify_patterns = args.notify_patterns();
+        let exclude_patterns = args.exclude_patterns();
 
         // Validate and compile regex patterns if needed
         let regex_patterns = if args.regex {
             Self::compile_regex_patterns(&patterns, args.case_insensitive)?
+        } else {
+            vec![]
+        };
+
+        // Compile exclude patterns as regex if regex mode is enabled
+        let exclude_regex_patterns = if args.regex && !exclude_patterns.is_empty() {
+            Self::compile_regex_patterns(&exclude_patterns, args.case_insensitive)?
         } else {
             vec![]
         };
@@ -42,6 +55,8 @@ impl Config {
             files: args.files().to_vec(),
             patterns,
             regex_patterns,
+            exclude_patterns,
+            exclude_regex_patterns,
             case_insensitive: args.case_insensitive,
             color_mappings,
             notify_enabled: args.notify,
@@ -62,10 +77,14 @@ impl Config {
         for pattern in patterns {
             let mut regex_builder = regex::RegexBuilder::new(pattern);
             regex_builder.case_insensitive(case_insensitive);
+            // ReDoS protection: limit compiled regex size to prevent catastrophic backtracking
+            regex_builder.size_limit(REGEX_SIZE_LIMIT);
+            // Also limit DFA size for additional protection
+            regex_builder.dfa_size_limit(REGEX_SIZE_LIMIT);
 
             let regex = regex_builder
                 .build()
-                .with_context(|| format!("Invalid regex pattern: {}", pattern))?;
+                .with_context(|| format!("Invalid or too complex regex pattern: {}", pattern))?;
 
             compiled.push(regex);
         }
@@ -127,6 +146,43 @@ impl Config {
     pub fn get_color_for_pattern(&self, pattern: &str) -> Option<Color> {
         self.color_mappings.get(pattern).copied()
     }
+
+    /// Check if a line should be excluded based on exclude patterns
+    pub fn should_exclude(&self, line: &str) -> bool {
+        if self.exclude_patterns.is_empty() {
+            return false;
+        }
+
+        // If regex mode, use compiled exclude regex patterns
+        if !self.exclude_regex_patterns.is_empty() {
+            for regex in &self.exclude_regex_patterns {
+                if regex.is_match(line) {
+                    return true;
+                }
+            }
+        } else {
+            // Use literal matching for exclude patterns
+            let search_line = if self.case_insensitive {
+                line.to_lowercase()
+            } else {
+                line.to_string()
+            };
+
+            for pattern in &self.exclude_patterns {
+                let search_pattern = if self.case_insensitive {
+                    pattern.to_lowercase()
+                } else {
+                    pattern.clone()
+                };
+
+                if search_line.contains(&search_pattern) {
+                    return true;
+                }
+            }
+        }
+
+        false
+    }
 }
 
 #[cfg(test)]
@@ -157,6 +213,7 @@ mod tests {
     fn test_get_color_for_pattern() {
         let args = Args {
             files: vec![PathBuf::from("test.log")],
+            completions: None,
             patterns: "ERROR".to_string(),
             regex: false,
             case_insensitive: false,
@@ -165,6 +222,7 @@ mod tests {
             notify_patterns: None,
             quiet: false,
             dry_run: false,
+            exclude: None,
             prefix_file: Some(false),
             poll_interval: 1000,
             buffer_size: 8192,
@@ -180,5 +238,117 @@ mod tests {
         assert_eq!(config.get_color_for_pattern("INFO"), Some(Color::Green));
         assert_eq!(config.get_color_for_pattern("DEBUG"), Some(Color::Cyan));
         assert_eq!(config.get_color_for_pattern("UNKNOWN"), None);
+    }
+
+    #[test]
+    fn test_should_exclude_literal() {
+        let args = Args {
+            files: vec![PathBuf::from("test.log")],
+            completions: None,
+            patterns: "ERROR".to_string(),
+            regex: false,
+            case_insensitive: false,
+            color_map: None,
+            notify: false,
+            notify_patterns: None,
+            quiet: false,
+            dry_run: false,
+            exclude: Some("DEBUG,TRACE".to_string()),
+            prefix_file: Some(false),
+            poll_interval: 1000,
+            buffer_size: 8192,
+            no_color: false,
+            notify_throttle: 0,
+        };
+
+        let config = Config::from_args(&args).unwrap();
+
+        assert!(config.should_exclude("DEBUG: Some debug message"));
+        assert!(config.should_exclude("TRACE: Some trace message"));
+        assert!(!config.should_exclude("ERROR: Some error message"));
+        assert!(!config.should_exclude("INFO: Some info message"));
+    }
+
+    #[test]
+    fn test_should_exclude_case_insensitive() {
+        let args = Args {
+            files: vec![PathBuf::from("test.log")],
+            completions: None,
+            patterns: "ERROR".to_string(),
+            regex: false,
+            case_insensitive: true,
+            color_map: None,
+            notify: false,
+            notify_patterns: None,
+            quiet: false,
+            dry_run: false,
+            exclude: Some("debug".to_string()),
+            prefix_file: Some(false),
+            poll_interval: 1000,
+            buffer_size: 8192,
+            no_color: false,
+            notify_throttle: 0,
+        };
+
+        let config = Config::from_args(&args).unwrap();
+
+        assert!(config.should_exclude("DEBUG: Some debug message"));
+        assert!(config.should_exclude("debug: Some debug message"));
+        assert!(!config.should_exclude("ERROR: Some error message"));
+    }
+
+    #[test]
+    fn test_should_exclude_regex() {
+        let args = Args {
+            files: vec![PathBuf::from("test.log")],
+            completions: None,
+            patterns: "ERROR".to_string(),
+            regex: true,
+            case_insensitive: false,
+            color_map: None,
+            notify: false,
+            notify_patterns: None,
+            quiet: false,
+            dry_run: false,
+            exclude: Some(r"DEBUG|TRACE".to_string()),
+            prefix_file: Some(false),
+            poll_interval: 1000,
+            buffer_size: 8192,
+            no_color: false,
+            notify_throttle: 0,
+        };
+
+        let config = Config::from_args(&args).unwrap();
+
+        assert!(config.should_exclude("DEBUG: Some debug message"));
+        assert!(config.should_exclude("TRACE: Some trace message"));
+        assert!(!config.should_exclude("ERROR: Some error message"));
+    }
+
+    #[test]
+    fn test_should_exclude_empty() {
+        let args = Args {
+            files: vec![PathBuf::from("test.log")],
+            completions: None,
+            patterns: "ERROR".to_string(),
+            regex: false,
+            case_insensitive: false,
+            color_map: None,
+            notify: false,
+            notify_patterns: None,
+            quiet: false,
+            dry_run: false,
+            exclude: None,
+            prefix_file: Some(false),
+            poll_interval: 1000,
+            buffer_size: 8192,
+            no_color: false,
+            notify_throttle: 0,
+        };
+
+        let config = Config::from_args(&args).unwrap();
+
+        assert!(!config.should_exclude("DEBUG: Some debug message"));
+        assert!(!config.should_exclude("ERROR: Some error message"));
     }
 }

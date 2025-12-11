@@ -12,6 +12,12 @@ async fn main() {
 
     let args = Args::parse();
 
+    // Handle shell completions generation
+    if let Some(shell) = args.completions {
+        Args::generate_completions(shell);
+        process::exit(0);
+    }
+
     // Build configuration from CLI args
     let config = match Config::from_args(&args) {
         Ok(config) => config,

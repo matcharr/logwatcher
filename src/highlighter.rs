@@ -184,6 +184,7 @@ mod tests {
     fn create_test_config() -> Config {
         let args = Args {
             files: vec![PathBuf::from("test.log")],
+            completions: None,
             patterns: "ERROR".to_string(),
             regex: false,
             case_insensitive: false,
@@ -193,6 +194,7 @@ mod tests {
             notify_throttle: 5,
             dry_run: false,
             quiet: false,
+            exclude: None,
             no_color: true, // Disable colors for testing
             prefix_file: None,
             poll_interval: 100,
@@ -321,6 +323,7 @@ mod tests {
     fn test_color_choice_never() {
         let args = Args {
             files: vec![PathBuf::from("test.log")],
+            completions: None,
             patterns: "ERROR".to_string(),
             regex: false,
             case_insensitive: false,
@@ -329,6 +332,7 @@ mod tests {
             notify_patterns: None,
             quiet: false,
             dry_run: false,
+            exclude: None,
             prefix_file: Some(false),
             poll_interval: 1000,
             buffer_size: 8192,
@@ -347,6 +351,7 @@ mod tests {
     fn test_quiet_mode_skip_non_matching() {
         let args = Args {
             files: vec![PathBuf::from("test.log")],
+            completions: None,
             patterns: "ERROR".to_string(),
             regex: false,
             case_insensitive: false,
@@ -355,6 +360,7 @@ mod tests {
             notify_patterns: None,
             quiet: true, // Enable quiet mode
             dry_run: false,
+            exclude: None,
             prefix_file: Some(false),
             poll_interval: 1000,
             buffer_size: 8192,
