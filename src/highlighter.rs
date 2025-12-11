@@ -158,6 +158,9 @@ impl Highlighter {
         self.print_info("Shutdown summary:")?;
         self.print_plain(&format!("  Files watched: {}", stats.files_watched))?;
         self.print_plain(&format!("  Lines processed: {}", stats.lines_processed))?;
+        if stats.lines_excluded > 0 {
+            self.print_plain(&format!("  Lines excluded: {}", stats.lines_excluded))?;
+        }
         self.print_plain(&format!("  Matches found: {}", stats.matches_found))?;
         self.print_plain(&format!(
             "  Notifications sent: {}",
@@ -171,6 +174,7 @@ impl Highlighter {
 pub struct WatcherStats {
     pub files_watched: usize,
     pub lines_processed: usize,
+    pub lines_excluded: usize,
     pub matches_found: usize,
     pub notifications_sent: usize,
 }
@@ -272,6 +276,7 @@ mod tests {
         let stats = WatcherStats {
             files_watched: 2,
             lines_processed: 100,
+            lines_excluded: 10,
             matches_found: 5,
             notifications_sent: 3,
         };

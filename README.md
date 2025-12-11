@@ -228,7 +228,9 @@ Generate and install shell completions:
 # Bash
 logwatcher --completions bash > ~/.local/share/bash-completion/completions/logwatcher
 
-# Zsh
+# Zsh (requires ~/.zfunc to be in fpath)
+# Add to ~/.zshrc if not already present: fpath=(~/.zfunc $fpath)
+mkdir -p ~/.zfunc
 logwatcher --completions zsh > ~/.zfunc/_logwatcher
 
 # Fish

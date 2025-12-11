@@ -14,6 +14,7 @@ pub struct Config {
     pub patterns: Vec<String>,
     pub regex_patterns: Vec<Regex>,
     pub exclude_patterns: Vec<String>,
+    pub exclude_patterns_lowercase: Vec<String>, // Pre-computed for case-insensitive matching
     pub exclude_regex_patterns: Vec<Regex>,
     pub case_insensitive: bool,
     pub color_mappings: HashMap<String, Color>,
@@ -48,6 +49,13 @@ impl Config {
             vec![]
         };
 
+        // Pre-compute lowercase exclude patterns for case-insensitive matching
+        let exclude_patterns_lowercase = if args.case_insensitive {
+            exclude_patterns.iter().map(|p| p.to_lowercase()).collect()
+        } else {
+            vec![]
+        };
+
         // Parse color mappings
         let color_mappings = Self::parse_color_mappings(&args.color_mappings())?;
 
@@ -56,6 +64,7 @@ impl Config {
             patterns,
             regex_patterns,
             exclude_patterns,
+            exclude_patterns_lowercase,
             exclude_regex_patterns,
             case_insensitive: args.case_insensitive,
             color_mappings,
@@ -160,22 +169,18 @@ impl Config {
                     return true;
                 }
             }
+        } else if self.case_insensitive {
+            // Use pre-computed lowercase patterns for case-insensitive matching
+            let search_line = line.to_lowercase();
+            for pattern in &self.exclude_patterns_lowercase {
+                if search_line.contains(pattern) {
+                    return true;
+                }
+            }
         } else {
-            // Use literal matching for exclude patterns
-            let search_line = if self.case_insensitive {
-                line.to_lowercase()
-            } else {
-                line.to_string()
-            };
-
+            // Case-sensitive literal matching (no allocation needed for patterns)
             for pattern in &self.exclude_patterns {
-                let search_pattern = if self.case_insensitive {
-                    pattern.to_lowercase()
-                } else {
-                    pattern.clone()
-                };
-
-                if search_line.contains(&search_pattern) {
+                if line.contains(pattern.as_str()) {
                     return true;
                 }
             }
