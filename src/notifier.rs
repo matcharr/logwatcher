@@ -152,6 +152,7 @@ mod tests {
     fn create_test_config(notify_enabled: bool, throttle: u32) -> Config {
         let args = Args {
             files: vec![PathBuf::from("test.log")],
+            completions: None,
             patterns: "ERROR".to_string(),
             regex: false,
             case_insensitive: false,
@@ -161,6 +162,7 @@ mod tests {
             notify_throttle: throttle,
             dry_run: false,
             quiet: false,
+            exclude: None,
             no_color: false,
             prefix_file: None,
             poll_interval: 100,
@@ -258,6 +260,7 @@ mod tests {
         // Create config with specific notification patterns that exclude INFO
         let args = Args {
             files: vec![PathBuf::from("test.log")],
+            completions: None,
             patterns: "ERROR".to_string(),
             regex: false,
             case_insensitive: false,
@@ -266,6 +269,7 @@ mod tests {
             notify_patterns: Some("ERROR,WARN".to_string()),
             quiet: false,
             dry_run: false,
+            exclude: None,
             poll_interval: 1000,
             buffer_size: 1024,
             notify_throttle: 5,
@@ -302,6 +306,7 @@ mod tests {
         // Create a notifier with a very short throttle window to test reset logic
         let args = Args {
             files: vec![PathBuf::from("test.log")],
+            completions: None,
             patterns: "ERROR".to_string(),
             regex: false,
             case_insensitive: false,
@@ -310,6 +315,7 @@ mod tests {
             notify_patterns: None,
             quiet: false,
             dry_run: false,
+            exclude: None,
             poll_interval: 1000,
             buffer_size: 1024,
             notify_throttle: 5,

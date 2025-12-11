@@ -1,3 +1,6 @@
+// Allow deprecated cargo_bin - it still works for our use case
+#![allow(deprecated)]
+
 use assert_cmd::Command;
 use predicates::prelude::*;
 use std::io::Write;
@@ -18,7 +21,7 @@ fn test_version_output() {
     cmd.arg("--version");
     cmd.assert()
         .success()
-        .stdout(predicate::str::contains("logwatcher 0.1.0"));
+        .stdout(predicate::str::contains("logwatcher 0.2.1"));
 }
 
 #[test]
@@ -174,9 +177,9 @@ fn test_invalid_regex() {
         "--no-color",
     ]);
 
-    cmd.assert()
-        .failure()
-        .stderr(predicate::str::contains("Invalid regex pattern"));
+    cmd.assert().failure().stderr(predicate::str::contains(
+        "Invalid or too complex regex pattern",
+    ));
 }
 
 #[test]

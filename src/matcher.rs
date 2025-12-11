@@ -158,6 +158,7 @@ mod tests {
     fn create_test_config(patterns: &str, regex: bool, case_insensitive: bool) -> Config {
         let args = Args {
             files: vec![PathBuf::from("test.log")],
+            completions: None,
             patterns: patterns.to_string(),
             regex,
             case_insensitive,
@@ -167,6 +168,7 @@ mod tests {
             notify_throttle: 5,
             dry_run: false,
             quiet: false,
+            exclude: None,
             no_color: false,
             prefix_file: None,
             poll_interval: 100,

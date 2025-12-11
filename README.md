@@ -15,8 +15,11 @@ A powerful CLI tool for real-time log file monitoring with pattern highlighting 
 - **Multiple file support** - Monitor multiple log files simultaneously
 - **File rotation handling** - Automatically detect and handle log rotation
 - **Regex support** - Use regular expressions for advanced pattern matching
+- **Exclude patterns** - Filter out unwanted log lines with inverse matching
 - **Dry-run mode** - Test patterns without continuous monitoring
 - **Throttled notifications** - Prevent notification spam
+- **Shell completions** - Auto-complete support for bash, zsh, fish, and PowerShell
+- **Docker support** - Run in containers with the official Dockerfile
 
 ## Installation
 
@@ -33,6 +36,16 @@ sudo cp target/release/logwatcher /usr/local/bin/
 
 ```bash
 cargo install log-watcher
+```
+
+### Using Docker
+
+```bash
+# Build the image
+docker build -t logwatcher .
+
+# Run with a mounted log directory
+docker run -v /var/log:/logs logwatcher -f /logs/app.log
 ```
 
 ## Quick Start
@@ -98,6 +111,7 @@ logwatcher -f app.log -q -p "ERROR"
 | Flag | Short | Default | Description |
 |------|-------|---------|-------------|
 | `--pattern` | `-p` | `ERROR,WARN` | Comma-separated patterns to match |
+| `--exclude` | `-e` | (none) | Comma-separated patterns to exclude (inverse matching) |
 | `--regex` | `-r` | `false` | Treat patterns as regular expressions |
 | `--case-insensitive` | `-i` | `false` | Case-insensitive pattern matching |
 | `--color-map` | `-c` | (see below) | Custom pattern:color mappings |
@@ -125,6 +139,12 @@ logwatcher -f app.log -q -p "ERROR"
 |------|---------|-------------|
 | `--poll-interval` | `100` | File polling interval in milliseconds |
 | `--buffer-size` | `8192` | Read buffer size in bytes |
+
+### Shell Completions
+
+| Flag | Description |
+|------|-------------|
+| `--completions <SHELL>` | Generate shell completions (bash, zsh, fish, powershell) |
 
 ## Default Color Mappings
 
@@ -183,6 +203,41 @@ logwatcher -f app.log -q -r -p "user_id=\d+|session_\w+"
 # [2025-01-07 15:00:01] Login successful for user_id=12345
 # [2025-01-07 15:00:15] Order placed by user_id=67890
 # [2025-01-07 15:00:30] Session created: session_abc123
+```
+
+### Exclude Patterns
+
+Filter out noisy log entries while monitoring:
+
+```bash
+# Exclude DEBUG and TRACE messages
+logwatcher -f app.log -p "ERROR,WARN,INFO" -e "DEBUG,TRACE"
+
+# Exclude health checks and metrics
+logwatcher -f app.log -e "healthcheck,metrics,ping"
+
+# With regex: exclude lines containing timestamps in a specific format
+logwatcher -f app.log -r -e "^\d{4}-\d{2}-\d{2}.*DEBUG"
+```
+
+### Shell Completions
+
+Generate and install shell completions:
+
+```bash
+# Bash
+logwatcher --completions bash > ~/.local/share/bash-completion/completions/logwatcher
+
+# Zsh (requires ~/.zfunc to be in fpath)
+# Add to ~/.zshrc if not already present: fpath=(~/.zfunc $fpath)
+mkdir -p ~/.zfunc
+logwatcher --completions zsh > ~/.zfunc/_logwatcher
+
+# Fish
+logwatcher --completions fish > ~/.config/fish/completions/logwatcher.fish
+
+# PowerShell
+logwatcher --completions powershell > $HOME\Documents\PowerShell\Scripts\logwatcher.ps1
 ```
 
 ## File Rotation Handling
@@ -329,6 +384,13 @@ cargo tarpaulin --out Html
 Coverage reports are automatically generated and uploaded to [Codecov](https://codecov.io/gh/matcharr/logwatcher) on every commit.
 
 ## Changelog
+
+### v0.2.0
+- **New:** Exclude patterns (`--exclude` / `-e`) for inverse matching
+- **New:** Shell completions (`--completions`) for bash, zsh, fish, PowerShell
+- **New:** Docker support with multi-stage Dockerfile
+- **Security:** ReDoS protection with regex size limits
+- **Fix:** Version now correctly reported from Cargo.toml
 
 ### v0.1.0
 - Initial release

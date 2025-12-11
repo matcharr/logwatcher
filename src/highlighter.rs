@@ -56,8 +56,8 @@ impl Highlighter {
         output_line.push_str(line);
 
         // Print with or without color
-        if match_result.matched && match_result.color.is_some() {
-            self.print_colored(&output_line, match_result.color.unwrap())?;
+        if let Some(color) = match_result.color {
+            self.print_colored(&output_line, color)?;
         } else {
             self.print_plain(&output_line)?;
         }
@@ -158,6 +158,9 @@ impl Highlighter {
         self.print_info("Shutdown summary:")?;
         self.print_plain(&format!("  Files watched: {}", stats.files_watched))?;
         self.print_plain(&format!("  Lines processed: {}", stats.lines_processed))?;
+        if stats.lines_excluded > 0 {
+            self.print_plain(&format!("  Lines excluded: {}", stats.lines_excluded))?;
+        }
         self.print_plain(&format!("  Matches found: {}", stats.matches_found))?;
         self.print_plain(&format!(
             "  Notifications sent: {}",
@@ -171,6 +174,7 @@ impl Highlighter {
 pub struct WatcherStats {
     pub files_watched: usize,
     pub lines_processed: usize,
+    pub lines_excluded: usize,
     pub matches_found: usize,
     pub notifications_sent: usize,
 }
@@ -184,6 +188,7 @@ mod tests {
     fn create_test_config() -> Config {
         let args = Args {
             files: vec![PathBuf::from("test.log")],
+            completions: None,
             patterns: "ERROR".to_string(),
             regex: false,
             case_insensitive: false,
@@ -193,6 +198,7 @@ mod tests {
             notify_throttle: 5,
             dry_run: false,
             quiet: false,
+            exclude: None,
             no_color: true, // Disable colors for testing
             prefix_file: None,
             poll_interval: 100,
@@ -270,6 +276,7 @@ mod tests {
         let stats = WatcherStats {
             files_watched: 2,
             lines_processed: 100,
+            lines_excluded: 10,
             matches_found: 5,
             notifications_sent: 3,
         };
@@ -321,6 +328,7 @@ mod tests {
     fn test_color_choice_never() {
         let args = Args {
             files: vec![PathBuf::from("test.log")],
+            completions: None,
             patterns: "ERROR".to_string(),
             regex: false,
             case_insensitive: false,
@@ -329,6 +337,7 @@ mod tests {
             notify_patterns: None,
             quiet: false,
             dry_run: false,
+            exclude: None,
             prefix_file: Some(false),
             poll_interval: 1000,
             buffer_size: 8192,
@@ -347,6 +356,7 @@ mod tests {
     fn test_quiet_mode_skip_non_matching() {
         let args = Args {
             files: vec![PathBuf::from("test.log")],
+            completions: None,
             patterns: "ERROR".to_string(),
             regex: false,
             case_insensitive: false,
@@ -355,6 +365,7 @@ mod tests {
             notify_patterns: None,
             quiet: true, // Enable quiet mode
             dry_run: false,
+            exclude: None,
             prefix_file: Some(false),
             poll_interval: 1000,
             buffer_size: 8192,
